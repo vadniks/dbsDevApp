@@ -3,6 +3,7 @@ package com.example.dbsdevapp
 import com.example.dbsdevapp.entity.*
 import com.example.dbsdevapp.repo.ClientRepo
 import com.example.dbsdevapp.repo.ComponentRepo
+import com.example.dbsdevapp.repo.EmployeeInfoRepo
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -18,7 +19,8 @@ inline fun <reified T : Any?> Json.getTyped(key: String) = get(key) as T
 @RestController
 class Controller(
     private val componentRepo: ComponentRepo,
-    private val clientRepo: ClientRepo
+    private val clientRepo: ClientRepo,
+    private val employeeInfoRepo: EmployeeInfoRepo
 ) {
 
     // curl 'localhost:8080/insert/component' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":1}'
@@ -32,6 +34,7 @@ class Controller(
         return if (when (which) {
             COMPONENT -> componentRepo.insert(json.component)
             CLIENT -> clientRepo.insert(json.client)
+            EMPLOYEE_INFO -> employeeInfoRepo.insert(json.employeeInfo)
             else -> false
         }) responseOk else responseBadRequest
     }
@@ -48,6 +51,7 @@ class Controller(
         return when (which) {
             COMPONENT -> componentRepo.get(id)
             CLIENT -> clientRepo.get(id)
+            EMPLOYEE_INFO -> employeeInfoRepo.get(id)
             else -> null
         }?.json
     }
@@ -63,6 +67,7 @@ class Controller(
         return when (which) {
             COMPONENT -> componentRepo.get()
             CLIENT -> clientRepo.get()
+            EMPLOYEE_INFO -> employeeInfoRepo.get()
             else -> emptyList()
         }.map { it.json }
     }
@@ -78,6 +83,7 @@ class Controller(
         return if (when (which) {
             COMPONENT -> componentRepo.update(json.component)
             CLIENT -> clientRepo.update(json.client)
+            EMPLOYEE_INFO -> employeeInfoRepo.update(json.employeeInfo)
             else -> false
         }) responseOk else responseBadRequest
     }
@@ -93,6 +99,7 @@ class Controller(
         return if (when (which) {
             COMPONENT -> componentRepo.delete(id)
             CLIENT -> clientRepo.delete(id)
+            EMPLOYEE_INFO -> clientRepo.delete(id)
             else -> false
         }) responseOk else responseBadRequest
     }
