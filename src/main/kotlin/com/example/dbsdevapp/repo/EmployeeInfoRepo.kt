@@ -21,6 +21,9 @@ class EmployeeInfoRepo(
     fun get(id: Int) = template.queryForObject(
         "select * from $EMPLOYEE_INFO where $EMPLOYEE_ID = ?", employeeInfoMapper, id)
 
+    fun get(email: String) = template.queryForObject(
+        "select $EMPLOYEE_ID from $EMPLOYEE_INFO where $EMPLOYEE_ID = ?", Integer::class.java) as Int
+
     fun get(): List<EmployeeInfo> = template.query("select * from $EMPLOYEE_INFO", employeeInfoMapper)
 
     fun update(employeeInfo: EmployeeInfo) = template.update(

@@ -4,6 +4,7 @@ import com.example.dbsdevapp.entity.*
 import com.example.dbsdevapp.repo.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 private typealias VoidResponse = ResponseEntity<Void>
@@ -34,13 +35,37 @@ class Controller(
         return if (when (which) {
             COMPONENT -> componentRepo.insert(json.component)
             CLIENT -> clientRepo.insert(json.client)
-            EMPLOYEE_INFO -> employeeInfoRepo.insert(json.employeeInfo)
-            MANAGER -> employeesRepo.insert(json.manager)
-            DELIVERY_WORKER -> employeesRepo.insert(json.deliveryWorker)
-            ADMINISTRATOR -> employeesRepo.insert(json.administrator)
-            ORDER -> orderRepo.insert(json.order)
+//            EMPLOYEE_INFO -> employeeInfoRepo.insert(json.employeeInfo)
+//            MANAGER -> employeesRepo.insert(json.manager)
+//            DELIVERY_WORKER -> employeesRepo.insert(json.deliveryWorker)
+//            ADMINISTRATOR -> employeesRepo.insert(json.administrator)
+//            ORDER -> orderRepo.insert(json.order)
             else -> false
         }) responseOk else responseBadRequest
+    }
+
+    @Transactional
+    @PostMapping("/newEmployee")
+    fun newEmployee(
+        @RequestParam which: String,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String,
+        @RequestBody json: Json
+    ): VoidResponse {
+        if (credentials != "admin:admin") return responseBadRequest
+
+        val employeeInfo = try { json.employeeInfo } 
+        catch (_: Exception) { null } ?: return responseBadRequest
+
+        if (!employeeInfoRepo.insert(employeeInfo))
+            return responseBadRequest
+        val employeeId = employeeInfoRepo.get(employeeInfo.email)
+
+        return if (employeesRepo.insert(when (which) {
+            MANAGER -> Manager(employeeId)
+            DELIVERY_WORKER -> DeliveryWorker(employeeId)
+            ADMINISTRATOR -> Administrator(employeeId)
+            else -> return responseBadRequest
+        })) responseOk else responseBadRequest
     }
 
     // curl 'localhost:8080/component?id=1' -H 'Auth-credentials: admin:admin'
@@ -55,9 +80,9 @@ class Controller(
         return when (which) {
             COMPONENT -> componentRepo.get(id)
             CLIENT -> clientRepo.get(id)
-            EMPLOYEE_INFO -> employeeInfoRepo.get(id)
-            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.get(id, which)
-            ORDER -> orderRepo.get(id)
+//            EMPLOYEE_INFO -> employeeInfoRepo.get(id)
+//            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.get(id, which)
+//            ORDER -> orderRepo.get(id)
             else -> null
         }?.json
     }
@@ -91,9 +116,9 @@ class Controller(
         return if (when (which) {
             COMPONENT -> componentRepo.update(json.component)
             CLIENT -> clientRepo.update(json.client)
-            EMPLOYEE_INFO -> employeeInfoRepo.update(json.employeeInfo)
-            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> false
-            ORDER -> orderRepo.update(json.order)
+//            EMPLOYEE_INFO -> employeeInfoRepo.update(json.employeeInfo)
+//            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> false
+//            ORDER -> orderRepo.update(json.order)
             else -> false
         }) responseOk else responseBadRequest
     }
@@ -109,9 +134,9 @@ class Controller(
         return if (when (which) {
             COMPONENT -> componentRepo.delete(id)
             CLIENT -> clientRepo.delete(id)
-            EMPLOYEE_INFO -> clientRepo.delete(id)
-            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.delete(id, which)
-            ORDER -> orderRepo.delete(id)
+//            EMPLOYEE_INFO -> clientRepo.delete(id)
+//            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.delete(id, which)
+//            ORDER -> orderRepo.delete(id)
             else -> false
         }) responseOk else responseBadRequest
     }
