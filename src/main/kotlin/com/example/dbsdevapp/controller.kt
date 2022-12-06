@@ -12,6 +12,7 @@ private typealias VoidResponse = ResponseEntity<Void>
 private val responseOk = VoidResponse(HttpStatus.OK)
 private val responseBadRequest = VoidResponse(HttpStatus.BAD_REQUEST)
 private val responseForbidden = VoidResponse(HttpStatus.FORBIDDEN)
+private val responseServerError = VoidResponse(HttpStatus.INTERNAL_SERVER_ERROR)
 private const val AUTH_CREDENTIALS = "Auth-credentials"
 typealias Json = Map<String, Any?>
 private const val WHICH = "/{which}"
@@ -33,7 +34,7 @@ class Controller(
 
         return (when (role) {
             CLIENT -> clientRepo.get(credentials[0], credentials[1])
-            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeeInfoRepo.get(
+            MANAGER, DELIVERY_WORKER -> employeeInfoRepo.get(
                 credentials[0], credentials[1],
                 role.jobType ?: return false
             )
@@ -41,19 +42,20 @@ class Controller(
         }) != null
     }
 
+    private inline fun <T> T.authenticated(role: String, credentials: String, crossinline action: () -> T)
+    = if (checkRoleCredentials(role, credentials)) action() else this
+
     // curl 'localhost:8080/component' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":1}'
-    @PostMapping(WHICH)
-    fun insert(
-        @PathVariable which: String,
+    @PostMapping("/newComponent")
+    fun newComponent(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestBody json: Json
-    ) = credentials.authenticated {
-        if (when (which) {
-            COMPONENT -> componentRepo.insert(json.component)
-            CLIENT -> clientRepo.insert(json.client)
-            else -> false
-        }) responseOk else responseBadRequest
-    }
+    ): VoidResponse = responseForbidden.authenticated(MANAGER, credentials)
+    { if (componentRepo.insert(json.component)) responseOk else responseBadRequest }
+
+    @PostMapping("/newClient")
+    fun newClient(@RequestBody json: Json): VoidResponse
+    = if (componentRepo.insert(json.component)) responseOk else responseBadRequest
 
     @Transactional
     @PostMapping("/newEmployee")
@@ -67,14 +69,18 @@ class Controller(
         val employeeInfo = try { json.employeeInfo } 
         catch (_: Exception) { null } ?: return responseBadRequest
 
+        if (employeeInfo.jobType != which.jobType)
+            return responseBadRequest
+
         if (!employeeInfoRepo.insert(employeeInfo))
             return responseBadRequest
+
         val employeeId = employeeInfoRepo.get(employeeInfo.email)
+            ?: return responseBadRequest
 
         return if (employeesRepo.insert(when (which) {
             MANAGER -> Manager(employeeId)
             DELIVERY_WORKER -> DeliveryWorker(employeeId)
-            ADMINISTRATOR -> Administrator(employeeId)
             else -> return responseBadRequest
         })) responseOk else responseBadRequest
     }
