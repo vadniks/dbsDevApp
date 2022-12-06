@@ -12,7 +12,15 @@ data class Component(
     val cost: Int,
     val image: String?,
     val count: Int
-)
+) : IEntity { override val json get() = HashMap<String, Any?>().apply {
+    put(COMPONENT_ID, id)
+    put(NAME, name)
+    put(TYPE, type.type)
+    put(DESCRIPTION, description)
+    put(COST, cost)
+    put(IMAGE, image)
+    put(COUNT, count)
+} }
 
 val Json.component get() = Component(
     getTyped(COMPONENT_ID),
@@ -23,16 +31,6 @@ val Json.component get() = Component(
     getTyped(IMAGE),
     getTyped(COUNT)
 )
-
-val Component.json get() = HashMap<String, Any>().apply {
-    put(COMPONENT_ID, id ?: -1)
-    put(NAME, name)
-    put(TYPE, type.type)
-    put(DESCRIPTION, description)
-    put(COST, cost)
-    put(IMAGE, image.toString())
-    put(COUNT, count)
-}
 
 const val COMPONENT_ID = "componentId"
 const val TYPE = "type"

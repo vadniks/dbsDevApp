@@ -11,7 +11,7 @@ class ComponentRepo(
 ) {
 
     fun insert(component: Component) = template.update(
-        """insert into $COMPONENTS($COMPONENT_ID, $NAME, $TYPE, $DESCRIPTION, $COST, $IMAGE, $COUNT)
+        """insert into $COMPONENTS($NAME, $TYPE, $DESCRIPTION, $COST, $IMAGE, $COUNT)
            values(?, ?, ?, ?, ?, ?, ?)""".trimMargin(),
         component.id, component.name, component.type.type,
         component.description, component.cost, component.image,
