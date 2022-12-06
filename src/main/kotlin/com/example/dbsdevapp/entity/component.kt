@@ -1,5 +1,7 @@
 package com.example.dbsdevapp.entity
 
+import org.springframework.jdbc.core.RowMapper
+
 data class Component(
     val id: Int?,
     val name: String,
@@ -10,12 +12,13 @@ data class Component(
     val count: Int
 )
 
-const val ID = "id"
+const val COMPONENT_ID = "componentId"
 const val TYPE = "type"
 const val DESCRIPTION = "description"
 const val COST = "cost"
 const val IMAGE = "image"
 const val COUNT = "count"
+const val COMPONENTS = "components"
 
 enum class ComponentType(val type: Int, val title: String) {
     CPU (0, "Processor"),
@@ -29,8 +32,14 @@ enum class ComponentType(val type: Int, val title: String) {
     CASE(8, "Case")
 }
 
-fun Int.toType() = ComponentType.values().find { it.type == this }
+fun Int.toComponentType() = ComponentType.values().find { it.type == this }
 
-const val LENGTH_SHORT = 64
-const val LENGTH_MIDDLE = 128
-const val LENGTH_LONG = 512
+val componentMapper = RowMapper<Component> { resultSet, _ -> Component(
+    resultSet.getInt(COMPONENT_ID),
+    resultSet.getString(NAME),
+    resultSet.getInt(TYPE).toComponentType()!!,
+    resultSet.getString(DESCRIPTION),
+    resultSet.getInt(COST),
+    resultSet.getString(IMAGE),
+    resultSet.getInt(COUNT)
+) }

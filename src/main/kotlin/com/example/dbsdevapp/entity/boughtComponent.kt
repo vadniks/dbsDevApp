@@ -5,5 +5,3 @@ data class BoughtComponent(
     val orderId: Int,
     val clientId: Int
 )
-
-const val COMPONENT_ID = "componentId"
