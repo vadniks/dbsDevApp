@@ -22,7 +22,13 @@ class EmployeeInfoRepo(
         "select * from $EMPLOYEE_INFO where $EMPLOYEE_ID = ?", employeeInfoMapper, id)
 
     fun get(email: String) = template.queryForObject(
-        "select $EMPLOYEE_ID from $EMPLOYEE_INFO where $EMPLOYEE_ID = ?", Integer::class.java) as Int
+        "select $EMPLOYEE_ID from $EMPLOYEE_INFO where $EMPLOYEE_ID = ?", Int::class.java)
+
+    fun get(name: String, password: String, jobType: JobType) = template.queryForObject(
+        "select * from $EMPLOYEE_INFO where $NAME = ? and $PASSWORD = ? and $JOB_TYPE = ?",
+        employeeInfoMapper,
+        name, password, jobType.type
+    )
 
     fun get(): List<EmployeeInfo> = template.query("select * from $EMPLOYEE_INFO", employeeInfoMapper)
 

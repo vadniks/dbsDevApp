@@ -6,10 +6,12 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
+import kotlin.reflect.KClass
 
 private typealias VoidResponse = ResponseEntity<Void>
 private val responseOk = VoidResponse(HttpStatus.OK)
 private val responseBadRequest = VoidResponse(HttpStatus.BAD_REQUEST)
+private val responseForbidden = VoidResponse(HttpStatus.FORBIDDEN)
 private const val AUTH_CREDENTIALS = "Auth-credentials"
 typealias Json = Map<String, Any?>
 private const val WHICH = "/{which}"
@@ -24,22 +26,31 @@ class Controller(
     private val orderRepo: OrderRepo
 ) {
 
+    @Suppress("NAME_SHADOWING")
+    private fun checkRoleCredentials(role: String, credentials: String): Boolean {
+        val credentials = credentials.split(':')
+        if (credentials.size != 2) return false
+
+        return (when (role) {
+            CLIENT -> clientRepo.get(credentials[0], credentials[1])
+            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeeInfoRepo.get(
+                credentials[0], credentials[1],
+                role.jobType ?: return false
+            )
+            else -> null
+        }) != null
+    }
+
     // curl 'localhost:8080/component' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":1}'
     @PostMapping(WHICH)
     fun insert(
         @PathVariable which: String,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestBody json: Json
-    ): VoidResponse {
-        if (credentials != "admin:admin") return responseBadRequest
-        return if (when (which) {
+    ) = credentials.authenticated {
+        if (when (which) {
             COMPONENT -> componentRepo.insert(json.component)
             CLIENT -> clientRepo.insert(json.client)
-//            EMPLOYEE_INFO -> employeeInfoRepo.insert(json.employeeInfo)
-//            MANAGER -> employeesRepo.insert(json.manager)
-//            DELIVERY_WORKER -> employeesRepo.insert(json.deliveryWorker)
-//            ADMINISTRATOR -> employeesRepo.insert(json.administrator)
-//            ORDER -> orderRepo.insert(json.order)
             else -> false
         }) responseOk else responseBadRequest
     }
@@ -67,6 +78,8 @@ class Controller(
             else -> return responseBadRequest
         })) responseOk else responseBadRequest
     }
+
+
 
     // curl 'localhost:8080/component?id=1' -H 'Auth-credentials: admin:admin'
     @ResponseBody
@@ -116,7 +129,7 @@ class Controller(
         return if (when (which) {
             COMPONENT -> componentRepo.update(json.component)
             CLIENT -> clientRepo.update(json.client)
-//            EMPLOYEE_INFO -> employeeInfoRepo.update(json.employeeInfo)
+            EMPLOYEE_INFO -> employeeInfoRepo.update(json.employeeInfo)
 //            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> false
 //            ORDER -> orderRepo.update(json.order)
             else -> false

@@ -22,6 +22,12 @@ class ClientRepo(
 
     fun get(): List<Client> = template.query("select * from $CLIENTS", clientMapper)
 
+    fun get(name: String, password: String) = template.queryForObject(
+        "select * from $CLIENTS where $NAME = ? and $PASSWORD = ?",
+        clientMapper,
+        name, password
+    )
+
     fun update(client: Client) = template.update(
         """update $CLIENTS set $NAME = ?, $SURNAME = ?, $PHONE = ?, $ADDRESS = ?, $EMAIL = ?, $PASSWORD = ?
            where $CLIENT_ID = ?""".trimMargin(),
