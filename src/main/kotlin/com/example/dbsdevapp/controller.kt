@@ -4,13 +4,7 @@ import com.example.dbsdevapp.entity.*
 import com.example.dbsdevapp.repo.ComponentRepo
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 private typealias VoidResponse = ResponseEntity<Void>
 private val responseOk = VoidResponse(HttpStatus.OK)
@@ -37,7 +31,7 @@ class Controller(private val componentRepo: ComponentRepo) {
     }
 
     @ResponseBody
-    @PostMapping("/get$WHICH")
+    @GetMapping("/get$WHICH")
     fun get(
         @PathVariable which: String,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
@@ -47,6 +41,45 @@ class Controller(private val componentRepo: ComponentRepo) {
         return when (which) {
             COMPONENT -> componentRepo.get(id)?.json
             else -> null
+        }
+    }
+
+    @ResponseBody
+    @GetMapping("/getAll$WHICH")
+    fun getAll(
+        @PathVariable which: String,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String
+    ): List<Json> {
+        if (credentials != "admin:admin") return emptyList()
+        return when (which) {
+            COMPONENT -> componentRepo.get()
+            else -> null
+        }
+    }
+
+    @PutMapping("/update$WHICH")
+    fun update(
+        @PathVariable which: String,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String,
+        @RequestBody json: Json
+    ): VoidResponse {
+        if (credentials != "admin:admin") return responseBadRequest
+        return when (which) {
+            COMPONENT -> if (componentRepo.update(json.component)) responseOk else responseBadRequest
+            else -> responseBadRequest
+        }
+    }
+
+    @DeleteMapping("/delete$WHICH")
+    fun delete(
+        @PathVariable which: String,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String,
+        @RequestParam id: Int
+    ): VoidResponse {
+        if (credentials != "admin:admin") return responseBadRequest
+        return when (which) {
+            COMPONENT -> if (componentRepo.delete(id)) responseOk else responseBadRequest
+            else -> responseBadRequest
         }
     }
 }

@@ -21,7 +21,7 @@ class ComponentRepo(
     fun get(id: Int) = template.queryForObject(
         "select * from $COMPONENTS where $COMPONENT_ID = ?", componentMapper, id)
 
-    fun get() = template.queryForObject("select * from $COMPONENTS", componentMapper)
+    fun get(): List<Component> = template.query("select * from $COMPONENTS", componentMapper)
 
     fun update(component: Component) = template.update(
         """update $COMPONENTS set $NAME = ?, $TYPE = ?, $DESCRIPTION = ?, $COST = ?, $IMAGE = ?, $COUNT = ?
