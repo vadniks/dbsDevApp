@@ -38,6 +38,7 @@ val Json.employeeInfo get() = EmployeeInfo(
 const val EMPLOYEE_ID = "employeeId"
 const val SALARY = "salary"
 const val JOB_TYPE = "jobType"
+const val EMPLOYEE_INFO = "employeeInfo"
 
 enum class JobType(val type: Int) {
     MANAGER(0),

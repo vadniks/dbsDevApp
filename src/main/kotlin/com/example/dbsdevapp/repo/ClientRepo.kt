@@ -11,11 +11,10 @@ class ClientRepo(
 ) {
 
     fun insert(client: Client) = template.update(
-        """insert into $CLIENTS($CLIENT_ID, $NAME, $SURNAME, $PHONE, $ADDRESS, $EMAIL, $PASSWORD)
-           values(?, ?, ?, ?, ?, ?, ?)""".trimMargin(),
-        client.id, client.name, client.surname,
-        client.phone, client.address, client.email,
-        client.password
+        """insert into $CLIENTS($NAME, $SURNAME, $PHONE, $ADDRESS, $EMAIL, $PASSWORD)
+           values(?, ?, ?, ?, ?, ?)""".trimMargin(),
+        client.name, client.surname, client.phone,
+        client.address, client.email, client.password
     ) == 1
 
     fun get(id: Int) = template.queryForObject(
