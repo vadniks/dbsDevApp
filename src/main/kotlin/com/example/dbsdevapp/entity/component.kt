@@ -1,5 +1,7 @@
 package com.example.dbsdevapp.entity
 
+import com.example.dbsdevapp.Json
+import com.example.dbsdevapp.getTyped
 import org.springframework.jdbc.core.RowMapper
 
 data class Component(
@@ -12,6 +14,26 @@ data class Component(
     val count: Int
 )
 
+val Json.component get() = Component(
+    getTyped(COMPONENT_ID),
+    getTyped(NAME),
+    getTyped<Int?>(TYPE)?.toComponentType()!!,
+    getTyped(DESCRIPTION),
+    getTyped(COST),
+    getTyped(IMAGE),
+    getTyped(COUNT)
+)
+
+val Component.json get() = HashMap<String, Any>().apply {
+    put(COMPONENT_ID, id ?: -1)
+    put(NAME, name)
+    put(TYPE, type.type)
+    put(DESCRIPTION, description)
+    put(COST, cost)
+    put(IMAGE, image.toString())
+    put(COUNT, count)
+}
+
 const val COMPONENT_ID = "componentId"
 const val TYPE = "type"
 const val DESCRIPTION = "description"
@@ -19,6 +41,7 @@ const val COST = "cost"
 const val IMAGE = "image"
 const val COUNT = "count"
 const val COMPONENTS = "components"
+const val COMPONENT = "component"
 
 enum class ComponentType(val type: Int, val title: String) {
     CPU (0, "Processor"),
