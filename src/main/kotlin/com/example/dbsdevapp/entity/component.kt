@@ -24,12 +24,12 @@ data class Component(
 
 val Json.component get() = Component(
     getTyped(COMPONENT_ID),
-    getTyped(NAME),
+    getTyped(NAME)!!,
     getTyped<Int?>(TYPE)?.toComponentType()!!,
-    getTyped(DESCRIPTION),
-    getTyped(COST),
+    getTyped(DESCRIPTION)!!,
+    getTyped(COST)!!,
     getTyped(IMAGE),
-    getTyped(COUNT)
+    getTyped(COUNT)!!
 )
 
 const val COMPONENT_ID = "componentId"
@@ -56,11 +56,11 @@ enum class ComponentType(val type: Int, val title: String) {
 fun Int.toComponentType() = ComponentType.values().find { it.type == this }
 
 val componentMapper = RowMapper<Component> { resultSet, _ -> Component(
-    resultSet.getInt(COMPONENT_ID),
-    resultSet.getString(NAME),
-    resultSet.getInt(TYPE).toComponentType()!!,
-    resultSet.getString(DESCRIPTION),
-    resultSet.getInt(COST),
-    resultSet.getString(IMAGE),
-    resultSet.getInt(COUNT)
+    resultSet.getNullableInt(COMPONENT_ID),
+    resultSet.getNullableString(NAME)!!,
+    resultSet.getNullableInt(TYPE)?.toComponentType()!!,
+    resultSet.getNullableString(DESCRIPTION)!!,
+    resultSet.getNullableInt(COST)!!,
+    resultSet.getNullableString(IMAGE),
+    resultSet.getNullableInt(COUNT)!!
 ) }

@@ -26,13 +26,13 @@ data class EmployeeInfo(
 
 val Json.employeeInfo get() = EmployeeInfo(
     getTyped(EMPLOYEE_ID),
-    getTyped(NAME),
-    getTyped(SURNAME),
-    getTyped(PHONE),
-    getTyped(EMAIL),
-    getTyped(PASSWORD),
-    getTyped(SALARY),
-    getTyped(JOB_TYPE)
+    getTyped(NAME)!!,
+    getTyped(SURNAME)!!,
+    getTyped(PHONE)!!,
+    getTyped(EMAIL)!!,
+    getTyped(PASSWORD)!!,
+    getTyped(SALARY)!!,
+    getTyped(JOB_TYPE)!!
 )
 
 const val EMPLOYEE_ID = "employeeId"
@@ -49,12 +49,12 @@ enum class JobType(val type: Int) {
 val Int.jobType get() = JobType.values().find { it.type == this }
 
 val employeeInfoMapper = RowMapper<EmployeeInfo> { resultSet, _ -> EmployeeInfo(
-    resultSet.getInt(EMPLOYEE_ID),
-    resultSet.getString(NAME),
-    resultSet.getString(SURNAME),
-    resultSet.getInt(PHONE),
-    resultSet.getString(EMAIL),
-    resultSet.getString(PASSWORD),
-    resultSet.getInt(SALARY),
-    resultSet.getInt(JOB_TYPE).jobType!!
+    resultSet.getNullableInt(EMPLOYEE_ID),
+    resultSet.getNullableString(NAME)!!,
+    resultSet.getNullableString(SURNAME)!!,
+    resultSet.getNullableInt(PHONE)!!,
+    resultSet.getNullableString(EMAIL)!!,
+    resultSet.getNullableString(PASSWORD)!!,
+    resultSet.getNullableInt(SALARY)!!,
+    resultSet.getNullableInt(JOB_TYPE)?.jobType!!
 ) }

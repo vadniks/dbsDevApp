@@ -24,12 +24,12 @@ data class Client(
 
 val Json.client get() = Client(
     getTyped(CLIENT_ID),
-    getTyped(NAME),
-    getTyped(SURNAME),
-    getTyped(PHONE),
-    getTyped(ADDRESS),
-    getTyped(EMAIL),
-    getTyped(PASSWORD)
+    getTyped(NAME)!!,
+    getTyped(SURNAME)!!,
+    getTyped(PHONE)!!,
+    getTyped(ADDRESS)!!,
+    getTyped(EMAIL)!!,
+    getTyped(PASSWORD)!!
 )
 
 const val NAME = "name"
@@ -42,11 +42,11 @@ const val CLIENTS = "clients"
 const val CLIENT = "client"
 
 val clientMapper = RowMapper<Client> { resultSet, _ -> Client(
-    resultSet.getInt(CLIENT_ID),
-    resultSet.getString(NAME),
-    resultSet.getString(SURNAME),
-    resultSet.getInt(PHONE),
-    resultSet.getString(ADDRESS),
-    resultSet.getString(EMAIL),
-    resultSet.getString(PASSWORD)
+    resultSet.getNullableInt(CLIENT_ID),
+    resultSet.getNullableString(NAME)!!,
+    resultSet.getNullableString(SURNAME)!!,
+    resultSet.getNullableInt(PHONE)!!,
+    resultSet.getNullableString(ADDRESS)!!,
+    resultSet.getNullableString(EMAIL)!!,
+    resultSet.getNullableString(PASSWORD)!!
 ) }

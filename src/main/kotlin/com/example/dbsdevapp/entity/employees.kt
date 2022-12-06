@@ -24,12 +24,12 @@ val MANAGER = Manager::class.simpleName!!
 val DELIVERY_WORKER = DeliveryWorker::class.simpleName!!
 val ADMINISTRATOR = Administrator::class.simpleName!!
 
-val Json.manager get() = Manager(employeeId())
-val Json.deliveryWorker get() = DeliveryWorker(employeeId())
-val Json.administrator get() = Administrator(employeeId())
+val Json.manager get() = Manager(employeeId()!!)
+val Json.deliveryWorker get() = DeliveryWorker(employeeId()!!)
+val Json.administrator get() = Administrator(employeeId()!!)
 
 private fun <T : IEmployee> employeeMapper(clazz: KClass<T>, resultSet: ResultSet) =
-    clazz.primaryConstructor?.call(resultSet.getInt(EMPLOYEE_ID))!!
+    clazz.primaryConstructor?.call(resultSet.getNullableInt(EMPLOYEE_ID)!!)!!
 
 val employeeMappers = arrayOf(
     MANAGER to RowMapper { rs, _ -> employeeMapper(Manager::class, rs) },

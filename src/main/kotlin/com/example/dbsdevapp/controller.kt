@@ -15,7 +15,7 @@ private val responseBadRequest = VoidResponse(HttpStatus.BAD_REQUEST)
 private const val AUTH_CREDENTIALS = "Auth-credentials"
 typealias Json = Map<String, Any?>
 private const val WHICH = "/{which}"
-inline fun <reified T : Any?> Json.getTyped(key: String) = get(key) as T
+inline fun <reified T : Any?> Json.getTyped(key: String) = get(key) as T?
 
 @RestController
 class Controller(
