@@ -11,7 +11,7 @@ class EmployeeInfoRepo(
 ) {
 
     fun insert(employeeInfo: EmployeeInfo) = template.update(
-        """insert into $EMPLOYEE_ID($NAME, $SURNAME, $PHONE, $EMAIL, $PASSWORD, $SALARY, $JOB_TYPE)
+        """insert into $EMPLOYEE_INFO($NAME, $SURNAME, $PHONE, $EMAIL, $PASSWORD, $SALARY, $JOB_TYPE)
            values(?, ?, ?, ?, ?, ?, ?)""".trimMargin(),
         employeeInfo.name, employeeInfo.surname, employeeInfo.phone,
         employeeInfo.email, employeeInfo.password, employeeInfo.salary,

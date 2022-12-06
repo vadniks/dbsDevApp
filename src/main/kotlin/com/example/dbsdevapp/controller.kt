@@ -4,6 +4,7 @@ import com.example.dbsdevapp.entity.*
 import com.example.dbsdevapp.repo.ClientRepo
 import com.example.dbsdevapp.repo.ComponentRepo
 import com.example.dbsdevapp.repo.EmployeeInfoRepo
+import com.example.dbsdevapp.repo.EmployeesRepo
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -20,7 +21,8 @@ inline fun <reified T : Any?> Json.getTyped(key: String) = get(key) as T
 class Controller(
     private val componentRepo: ComponentRepo,
     private val clientRepo: ClientRepo,
-    private val employeeInfoRepo: EmployeeInfoRepo
+    private val employeeInfoRepo: EmployeeInfoRepo,
+    private val employeesRepo: EmployeesRepo
 ) {
 
     // curl 'localhost:8080/insert/component' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":1}'
@@ -35,6 +37,9 @@ class Controller(
             COMPONENT -> componentRepo.insert(json.component)
             CLIENT -> clientRepo.insert(json.client)
             EMPLOYEE_INFO -> employeeInfoRepo.insert(json.employeeInfo)
+            MANAGER -> employeesRepo.insert(json.manager)
+            DELIVERY_WORKER -> employeesRepo.insert(json.deliveryWorker)
+            ADMINISTRATOR -> employeesRepo.insert(json.administrator)
             else -> false
         }) responseOk else responseBadRequest
     }
@@ -52,6 +57,7 @@ class Controller(
             COMPONENT -> componentRepo.get(id)
             CLIENT -> clientRepo.get(id)
             EMPLOYEE_INFO -> employeeInfoRepo.get(id)
+            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.get(id, which)
             else -> null
         }?.json
     }
@@ -68,6 +74,7 @@ class Controller(
             COMPONENT -> componentRepo.get()
             CLIENT -> clientRepo.get()
             EMPLOYEE_INFO -> employeeInfoRepo.get()
+            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.get(which)
             else -> emptyList()
         }.map { it.json }
     }
@@ -84,6 +91,7 @@ class Controller(
             COMPONENT -> componentRepo.update(json.component)
             CLIENT -> clientRepo.update(json.client)
             EMPLOYEE_INFO -> employeeInfoRepo.update(json.employeeInfo)
+            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> false
             else -> false
         }) responseOk else responseBadRequest
     }
@@ -100,6 +108,7 @@ class Controller(
             COMPONENT -> componentRepo.delete(id)
             CLIENT -> clientRepo.delete(id)
             EMPLOYEE_INFO -> clientRepo.delete(id)
+            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.delete(id, which)
             else -> false
         }) responseOk else responseBadRequest
     }
