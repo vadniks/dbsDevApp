@@ -1,0 +1,22 @@
+services:
+#  web:
+#    build: .
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      db:
+#        condition: service_healthy
+#    container_name: dbs_dev_web
+  db:
+    image: mysql
+    container_name: dbs_dev_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: db
+    volumes:
+      - db:/var/lib/mysql
+    ports:
+      - "3306:3306"
+volumes:
+  db:
