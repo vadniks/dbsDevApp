@@ -1,10 +1,7 @@
 package com.example.dbsdevapp
 
 import com.example.dbsdevapp.entity.*
-import com.example.dbsdevapp.repo.ClientRepo
-import com.example.dbsdevapp.repo.ComponentRepo
-import com.example.dbsdevapp.repo.EmployeeInfoRepo
-import com.example.dbsdevapp.repo.EmployeesRepo
+import com.example.dbsdevapp.repo.*
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -22,7 +19,8 @@ class Controller(
     private val componentRepo: ComponentRepo,
     private val clientRepo: ClientRepo,
     private val employeeInfoRepo: EmployeeInfoRepo,
-    private val employeesRepo: EmployeesRepo
+    private val employeesRepo: EmployeesRepo,
+    private val orderRepo: OrderRepo
 ) {
 
     // curl 'localhost:8080/insert/component' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":1}'
@@ -40,6 +38,7 @@ class Controller(
             MANAGER -> employeesRepo.insert(json.manager)
             DELIVERY_WORKER -> employeesRepo.insert(json.deliveryWorker)
             ADMINISTRATOR -> employeesRepo.insert(json.administrator)
+            ORDER -> orderRepo.insert(json.order)
             else -> false
         }) responseOk else responseBadRequest
     }
@@ -58,6 +57,7 @@ class Controller(
             CLIENT -> clientRepo.get(id)
             EMPLOYEE_INFO -> employeeInfoRepo.get(id)
             MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.get(id, which)
+            ORDER -> orderRepo.get(id)
             else -> null
         }?.json
     }
@@ -75,6 +75,7 @@ class Controller(
             CLIENT -> clientRepo.get()
             EMPLOYEE_INFO -> employeeInfoRepo.get()
             MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.get(which)
+            ORDER -> orderRepo.get()
             else -> emptyList()
         }.map { it.json }
     }
@@ -92,6 +93,7 @@ class Controller(
             CLIENT -> clientRepo.update(json.client)
             EMPLOYEE_INFO -> employeeInfoRepo.update(json.employeeInfo)
             MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> false
+            ORDER -> orderRepo.update(json.order)
             else -> false
         }) responseOk else responseBadRequest
     }
@@ -109,6 +111,7 @@ class Controller(
             CLIENT -> clientRepo.delete(id)
             EMPLOYEE_INFO -> clientRepo.delete(id)
             MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.delete(id, which)
+            ORDER -> orderRepo.delete(id)
             else -> false
         }) responseOk else responseBadRequest
     }

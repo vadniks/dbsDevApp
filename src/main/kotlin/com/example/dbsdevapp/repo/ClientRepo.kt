@@ -30,5 +30,5 @@ class ClientRepo(
         client.id
     ) == 1
 
-    fun delete(id: Int) = template.update("delete from $COMPONENTS where $COMPONENT_ID = ?", id) == 1
+    fun delete(id: Int) = template.update("delete from $CLIENTS where $CLIENT_ID = ?", id) == 1
 }

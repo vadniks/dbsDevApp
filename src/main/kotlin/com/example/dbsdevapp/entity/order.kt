@@ -41,6 +41,8 @@ const val MANAGER_ID = "managerId"
 const val DELIVERY_WORKER_ID = "deliveryWorkerId"
 const val CREATED = "created"
 const val COMPLETED = "completed"
+const val ORDERS = "orders"
+const val ORDER = "order"
 
 val orderMapper = RowMapper<Order> { resultSet, _ -> Order(
     resultSet.getNullableInt(ORDER_ID)!!,
