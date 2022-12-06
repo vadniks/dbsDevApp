@@ -9,7 +9,7 @@ services:
 #    container_name: dbs_dev_web
   db:
     image: mysql
-    container_name: dbs_dev_mysql
+    container_name: dbs_dev_app_mysql
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: root
