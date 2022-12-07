@@ -174,7 +174,7 @@ class Controller(
     fun getEmployee(
         @RequestParam id: Int,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
-    ) = null.authenticated(MANAGER, credentials) { employeeInfoRepo.get(id) }
+    ) = null.authenticated(MANAGER, credentials) { employeeInfoRepo.get(id)?.json }
 
     // curl 'localhost:8080/getAllComponents'
     @ResponseBody
@@ -218,9 +218,9 @@ class Controller(
             ?: emptyList()
     }
 
-    // curl 'localhost:8080/getEmployeeByEmail?email=manager@email.com' -H 'Auth-credentials: manager:pass'
-    @GetMapping("/getEmployeeByEmail")
-    fun getEmployeeByEmail(
+    // curl 'localhost:8080/getEmployeeIdByEmail?email=manager@email.com' -H 'Auth-credentials: manager:pass'
+    @GetMapping("/getEmployeeIdByEmail")
+    fun getEmployeeIdByEmail(
         @RequestParam email: String,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
     ) = null.authenticated(MANAGER, credentials) { employeeInfoRepo.get1(email) }

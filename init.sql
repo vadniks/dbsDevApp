@@ -3,7 +3,13 @@ grant insert, select, update, delete, execute on db.* to 'server'@'%';
 flush privileges;
 use db;
 
-select * from employeeInfo where name = 'admin' and password = 'admin' and jobType = 0;
+drop table boughtComponents;
+drop table orders;
+drop table managers;
+drop table deliveryWorkers;
+drop table employeeInfo;
+drop table clients;
+drop table components;
 
 select * from components;
 select * from clients;
@@ -17,7 +23,7 @@ delete from components where components.componentId > 0;
 update orders set managerId = 1 where orderId = 4;
 
 insert into employeeInfo(name, surname, phone, email, password, salary, jobType) values(
-                                                                                           'admin', '_', 0000000000, 'admin@localhost.8080', 'admin', 0, 0);
+                                                                                           'manager', '_', 0000000000, 'manager@a.a', 'pass', 0, 0);
 insert into managers(employeeId) values(1);
 
 insert into components(componentid, name, type, description, cost, count) values(
@@ -32,6 +38,33 @@ insert into boughtComponents(componentId, orderId, clientId) values(2, 4, 1);
 
 insert into orders(clientId, managerId, deliveryWorkerId, cost, count, creationDatetime)
 values(1, null, null, 100, 3, 123);
+
+-- -------------------------------------------------------------------------------------------
+
+# curl 'localhost:8080/newComponent' -X POST -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"a","type":0,"description":"aa","cost":10,"image":null,"count":10}'
+# curl 'localhost:8080/newComponent' -X POST -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"b","type":1,"description":"bb","cost":100,"image":null,"count":10}'
+# curl 'localhost:8080/newComponent' -X POST -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"c","type":2,"description":"cc","cost":1000,"image":null,"count":10}'
+# curl 'localhost:8080/newComponent' -X POST -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"d","type":2,"description":"dd","cost":1000,"image":null,"count":10}'
+# curl 'localhost:8080/newComponent' -X POST -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"e","type":3,"description":"ee","cost":1000,"image":null,"count":10}'
+# curl 'localhost:8080/newClient' -X POST -H 'Content-Type: application/json' -d '{"clientId":null,"name":"client1","surname":"_","phone":1000000000,"address":"_","email":"client1@email.com","password":"pass"}'
+# curl 'localhost:8080/newClient' -X POST -H 'Content-Type: application/json' -d '{"clientId":null,"name":"client2","surname":"_","phone":1000000001,"address":"_","email":"client2@email.com","password":"pass"}'
+# curl 'localhost:8080/newEmployee' -X POST -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"manager2","surname":"_","phone":1000000010,"email":"manager2@email.com","password":"pass","salary":100,"jobType":0}'
+# curl 'localhost:8080/newEmployee' -X POST -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"delivery1","surname":"_","phone":1000000011,"email":"delivery1@email.com","password":"pass","salary":100,"jobType":1}'
+# curl 'localhost:8080/newEmployee' -X POST -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"delivery2","surname":"_","phone":1000000012,"email":"delivery2@email.com","password":"pass","salary":100,"jobType":1}'
+# curl 'localhost:8080/newOrder?clientId=1&componentIds=1,2' -X POST -H 'Auth-credentials: client1:pass'
+# curl 'localhost:8080/assignEmployeesToOrder?orderId=1&clientId=1&managerId=1&deliveryWorkerId=3' -X POST -H 'Auth-credentials: manager:pass'
+# curl 'localhost:8080/completeOrder?orderId=1&clientId=1' -X POST -H 'Auth-credentials: manager:pass'
+# curl 'localhost:8080/getComponent?id=1'
+# curl 'localhost:8080/getClient?id=1' -H 'Auth-credentials: manager:pass'
+# curl 'localhost:8080/getEmployee?id=1' -H 'Auth-credentials: manager:pass'
+# curl 'localhost:8080/getAllComponents'
+# curl 'localhost:8080/getAllClients' -H 'Auth-credentials: manager:pass'
+# curl 'localhost:8080/getUserOrders?clientId=1' -H 'Auth-credentials: client1:pass'
+# curl 'localhost:8080/getOrderedComponents?orderId=1&clientId=1' -H 'Auth-credentials: delivery1:pass'
+# curl 'localhost:8080/getEmployeeIdByEmail?email=manager@a.a' -H 'Auth-credentials: manager:pass'
+# curl 'localhost:8080/countOrders' -H 'Auth-credentials: manager:pass'
+
+-- -------------------------------------------------------------------------------------------
 
 create table components(
                            componentId integer unsigned not null auto_increment unique,
@@ -54,12 +87,6 @@ create table clients(
                         password varchar(255) not null,
                         primary key (clientId)
 );
-
-drop table boughtComponents;
-drop table orders;
-drop table employeeInfo;
-drop table managers;
-drop table deliveryWorkers;
 
 create table employeeInfo(
                              employeeId integer unsigned not null auto_increment unique,
