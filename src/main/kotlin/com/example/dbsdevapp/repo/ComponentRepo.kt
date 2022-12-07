@@ -35,5 +35,9 @@ class ComponentRepo(
         "update components set $COUNT = $COUNT - 1 where $COMPONENT_ID = ?", id
     ) == 1
 
+    fun increaseCount(id: Int) = template.update(
+        "update components set $COUNT = $COUNT + 1 where $COMPONENT_ID = ?", id
+    ) == 1
+
     fun delete(id: Int) = template.update("delete from $COMPONENTS where $COMPONENT_ID = ?", id) == 1
 }

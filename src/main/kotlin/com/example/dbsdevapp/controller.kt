@@ -71,12 +71,12 @@ class Controller(
             return@authenticated responseBadRequest
 
         val employeeId = employeeInfoRepo.get(employeeInfo.email)
-            ?: return@authenticated responseBadRequest
+            ?: throw IllegalStateException()
 
         if (when (employeeInfo.jobType) {
             JobType.MANAGER -> employeesRepo.insert(Manager(employeeId), MANAGERS)
             JobType.DELIVERY_WORKER -> employeesRepo.insert(DeliveryWorker(employeeId), DELIVERY_WORKERS)
-        }) responseOk else responseBadRequest
+        }) responseOk else throw IllegalStateException()
     }
 
     // curl 'localhost:8080/newOrder?clientId=1&componentIds=3,6' -X POST -H 'Auth-credentials: client1:pass'
@@ -111,14 +111,14 @@ class Controller(
             null, client.id!!,
             null, null,
             cost, count, created, null
-        ))) return responseBadRequest
+        ))) throw IllegalStateException()
 
-        val orderId = orderRepo.get1(clientId, created)?.orderId ?: return responseBadRequest
+        val orderId = orderRepo.get1(clientId, created)?.orderId ?: throw IllegalStateException()
 
         for (i in componentIds) if (
             !boughtComponentRepo.insert(BoughtComponent(i, orderId, clientId))
             || !componentRepo.decreaseCount(i)
-        ) return responseBadRequest
+        ) throw IllegalStateException()
 
         return responseOk
     }
@@ -275,9 +275,9 @@ class Controller(
                     return@authenticated responseBadRequest
 
         for (boughtComponent in bought)
-            if (!boughtComponentRepo.delete(boughtComponent)) return@authenticated responseBadRequest
+            if (!boughtComponentRepo.delete(boughtComponent)) throw IllegalStateException()
 
-        if (componentRepo.delete(id)) responseOk else responseBadRequest
+        if (componentRepo.delete(id)) responseOk else throw IllegalStateException()
     }
 
     @Transactional
@@ -286,13 +286,14 @@ class Controller(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestParam id: Int
     ) = responseForbidden.authenticated(MANAGER, credentials) {
-        var result = false
         for (order in orderRepo.get(id)) {
-            for (boughtComponent in boughtComponentRepo.get(order.orderId!!, order.clientId))
-                boughtComponentRepo.delete(boughtComponent)
-            result = orderRepo.delete(order.orderId, order.clientId)
+            for (boughtComponent in boughtComponentRepo.get(order.orderId!!, order.clientId)) {
+                if (!boughtComponentRepo.delete(boughtComponent)) throw IllegalStateException()
+                if (!componentRepo.increaseCount(boughtComponent.componentId)) throw IllegalStateException()
+            }
+            if (!orderRepo.delete(order.orderId, order.clientId)) throw IllegalStateException()
         }
-        if (result) responseOk else responseBadRequest
+        if (clientRepo.delete(id)) responseOk else throw IllegalStateException()
     }
 
     // curl 'localhost:8080/deleteEmployee?id=1' -X DELETE -H 'Auth-credentials: manager:pass'
