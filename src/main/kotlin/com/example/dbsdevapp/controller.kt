@@ -7,16 +7,13 @@ import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import kotlin.math.absoluteValue
-import kotlin.random.Random
 
 private typealias VoidResponse = ResponseEntity<Void>
 private val responseOk = VoidResponse(HttpStatus.OK)
 private val responseBadRequest = VoidResponse(HttpStatus.BAD_REQUEST)
 private val responseForbidden = VoidResponse(HttpStatus.FORBIDDEN)
-private val responseServerError = VoidResponse(HttpStatus.INTERNAL_SERVER_ERROR)
 private const val AUTH_CREDENTIALS = "Auth-credentials"
 typealias Json = Map<String, Any?>
-private const val WHICH = "/{which}"
 inline fun <reified T : Any?> Json.getTyped(key: String) = get(key) as T?
 
 @RestController
@@ -181,13 +178,13 @@ class Controller(
     // curl 'localhost:8080/getAllComponents'
     @ResponseBody
     @GetMapping("/getAllComponents")
-    fun getAllComponents() = componentRepo.get().map { it.json }
+    fun getAllComponents() = componentRepo.get().json
 
     // curl 'localhost:8080/getAllClients' -H 'Auth-credentials: manager:pass'
     @ResponseBody
     @GetMapping("/getAllClients")
     fun getAllClients(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
-    = emptyList<Json>().authenticated(MANAGER, credentials) { clientRepo.get().map { it.json } }
+    = emptyList<Json>().authenticated(MANAGER, credentials) { clientRepo.get().json }
 
     // curl 'localhost:8080/getUserOrders?clientId=1' -H 'Auth-credentials: client1:pass'
     @ResponseBody
@@ -195,29 +192,25 @@ class Controller(
     fun getUserOrders(
         @RequestParam clientId: Int,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
-    ) = { orderRepo.get(clientId).map { it.json } }.run {
+    ) = { orderRepo.get(clientId).json }.run {
         null.authenticated(CLIENT, credentials, this)
             ?: null.authenticated(MANAGER, credentials, this)
-            ?: emptyList<Json>()
+            ?: emptyList()
     }
-        //emptyList<Json>().authenticated(CLIENT, credentials) { orderRepo.get(clientId).map { it.json } }
 
-    /*
-    { orderRepo.get(clientId).map { it.json } }.apply {
-        null.authenticated(CLIENT, credentials, this)
-            ?: null.authenticated(MANAGER, credentials, this)
-            ?: emptyList<Json>()
-    }
-    */
-
-    //
+    // curl 'localhost:8080/getOrderedComponents?orderId=4&clientId=1' -H 'Auth-credentials: delivery:pass'
     @ResponseBody
     @GetMapping("/getOrderedComponents")
     fun getOrderedComponents(
         @RequestParam orderId: Int,
         @RequestParam clientId: Int,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
-    ) = { boughtComponentRepo.get(orderId, clientId) }.run {
+    ) = {
+        val components = ArrayList<Component>()
+        for (boughtComponent in boughtComponentRepo.get(orderId, clientId))
+            components.add(componentRepo.get(boughtComponent.componentId)!!)
+        components.json
+    }.run {
         null.authenticated(MANAGER, credentials, this)
             ?: null.authenticated(DELIVERY_WORKER, credentials, this)
             ?: null.authenticated(CLIENT, credentials, this)
