@@ -1,6 +1,7 @@
 package com.example.dbsdevapp.repo
 
 import com.example.dbsdevapp.entity.*
+import com.example.dbsdevapp.tryCatch
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 
@@ -17,16 +18,16 @@ class ClientRepo(
         client.address, client.email, client.password
     ) == 1
 
-    fun get(id: Int) = template.queryForObject(
-        "select * from $CLIENTS where $CLIENT_ID = ?", clientMapper, id)
+    fun get(id: Int) = null.tryCatch { template.queryForObject(
+        "select * from $CLIENTS where $CLIENT_ID = ?", clientMapper, id) }
 
     fun get(): List<Client> = template.query("select * from $CLIENTS", clientMapper)
 
-    fun get(name: String, password: String) = template.queryForObject(
+    fun get(name: String, password: String) = null.tryCatch { template.queryForObject(
         "select * from $CLIENTS where $NAME = ? and $PASSWORD = ?",
         clientMapper,
         name, password
-    )
+    ) }
 
     fun update(client: Client) = template.update(
         """update $CLIENTS set $NAME = ?, $SURNAME = ?, $PHONE = ?, $ADDRESS = ?, $EMAIL = ?, $PASSWORD = ?

@@ -1,6 +1,7 @@
 package com.example.dbsdevapp.repo
 
 import com.example.dbsdevapp.entity.*
+import com.example.dbsdevapp.tryCatch
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 
@@ -17,8 +18,8 @@ class ComponentRepo(
         component.cost, component.image, component.count
     ) == 1
 
-    fun get(id: Int) = template.queryForObject(
-        "select * from $COMPONENTS where $COMPONENT_ID = ?", componentMapper, id)
+    fun get(id: Int) = null.tryCatch { template.queryForObject(
+        "select * from $COMPONENTS where $COMPONENT_ID = ?", componentMapper, id) }
 
     fun get(): List<Component> = template.query("select * from $COMPONENTS", componentMapper)
 

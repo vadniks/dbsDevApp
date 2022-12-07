@@ -1,6 +1,8 @@
 package com.example.dbsdevapp.repo
 
 import com.example.dbsdevapp.entity.*
+import com.example.dbsdevapp.log
+import com.example.dbsdevapp.tryCatch
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 
@@ -12,24 +14,24 @@ class OrderRepo(
 
     fun insert(order: Order) = template.update(
         """insert into $ORDERS($CLIENT_ID, $MANAGER_ID, $DELIVERY_WORKER_ID, $COST, $COUNT, $CREATED, $COMPLETED)
-           values(?, ?, ?, ?, ?, ?, ?)""".trimMargin(),
+           values(?, ?, ?, ?, ?, ?, ?)""".trimMargin().apply { log.info(order.toString()) },
         order.clientId, order.managerId, order.deliveryWorkerId,
         order.cost, order.count, order.created,
         order.completed
     ) == 1
 
-    fun get(orderId: Int, clientId: Int) = template.queryForObject(
+    fun get(orderId: Int, clientId: Int) = null.tryCatch { template.queryForObject(
         "select * from $ORDERS where $ORDER_ID = ? and $CLIENT_ID = ?",
         orderMapper, orderId, clientId
-    )
+    ) }
 
     fun get(clientId: Int): List<Order> = template.query(
         "select * from $ORDERS where $CLIENT_ID = ?",
         orderMapper, clientId
     )
 
-    fun get1(clientId: Int, created: Int) = template.queryForObject(
-        "select * from $ORDERS where $CLIENT_ID = ? and $CREATED = ?", orderMapper, clientId, created)
+    fun get1(clientId: Int, created: Int) = null.tryCatch { template.queryForObject(
+        "select * from $ORDERS where $CLIENT_ID = ? and $CREATED = ?", orderMapper, clientId, created) }
 
     fun get(employeeId: Int, which: String): List<Order> = template.query(
         "select * from $ORDERS where ${

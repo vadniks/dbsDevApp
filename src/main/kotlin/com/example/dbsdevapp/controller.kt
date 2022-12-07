@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
+import kotlin.math.absoluteValue
 import kotlin.random.Random
 
 private typealias VoidResponse = ResponseEntity<Void>
@@ -46,7 +47,7 @@ class Controller(
     private inline fun <T> T.authenticated(role: String, credentials: String, crossinline action: () -> T)
     = if (checkRoleCredentials(role, credentials)) action() else this
 
-    // curl 'localhost:8080/newComponent' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":1}'
+    // curl 'localhost:8080/newComponent' -X POST -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":1}'
     @PostMapping("/newComponent")
     fun newComponent(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
@@ -54,13 +55,13 @@ class Controller(
     ) = responseForbidden.authenticated(MANAGER, credentials)
     { if (componentRepo.insert(json.component)) responseOk else responseBadRequest }
 
-    // curl 'localhost:8080/newClient' -H 'Content-Type: application/json' -d '{"clientId":null,"name":"client1","surname":"_","phone":1000000000,"address":"_","email":"client1@email.com","password":"pass"}'
+    // curl 'localhost:8080/newClient' -X POST -H 'Content-Type: application/json' -d '{"clientId":null,"name":"client1","surname":"_","phone":1000000000,"address":"_","email":"client1@email.com","password":"pass"}'
     @PostMapping("/newClient")
     fun newClient(@RequestBody json: Json)
     = if (clientRepo.insert(json.client)) responseOk else responseBadRequest
 
-    // curl 'localhost:8080/newEmployee' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"manager","surname":"_","phone":1000000001,"email":"manager@email.com","password":"pass","salary":100,"jobType":0}'
-    // curl 'localhost:8080/newEmployee' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"delivery","surname":"_","phone":1000000002,"email":"delivery@email.com","password":"pass","salary":100,"jobType":1}'
+    // curl 'localhost:8080/newEmployee' -X POST -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"manager","surname":"_","phone":1000000001,"email":"manager@email.com","password":"pass","salary":100,"jobType":0}'
+    // curl 'localhost:8080/newEmployee' -X POST -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"delivery","surname":"_","phone":1000000002,"email":"delivery@email.com","password":"pass","salary":100,"jobType":1}'
     @Transactional
     @PostMapping("/newEmployee")
     fun newEmployee(
@@ -81,6 +82,7 @@ class Controller(
         }) responseOk else responseBadRequest
     }
 
+    // curl 'localhost:8080/newOrder?clientId=1&componentIds=3,6' -X POST -H 'Auth-credentials: client1:pass'
     @Suppress("NAME_SHADOWING")
     @Transactional
     @PostMapping("/newOrder")
@@ -106,13 +108,11 @@ class Controller(
             count++
         }
 
-        val created = System.currentTimeMillis().toUInt().toInt()
-        val random = Random(created)
+        val created = System.currentTimeMillis().toInt().absoluteValue
 
         if (!orderRepo.insert(Order(
             null, client.id!!,
-            random.nextInt(employeesRepo.get(MANAGERS).size),
-            random.nextInt(employeesRepo.get(DELIVERY_WORKERS).size),
+            null, null,
             cost, count, created, null
         ))) return responseBadRequest
 

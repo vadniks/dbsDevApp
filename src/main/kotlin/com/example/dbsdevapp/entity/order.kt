@@ -13,34 +13,14 @@ data class Order(
     val count: Int,
     val created: Int,
     val completed: Int?
-) : IEntity { override val json = HashMap<String, Any?>().apply {
-    put(ORDER_ID, orderId)
-    put(CLIENT_ID, clientId)
-    put(MANAGER_ID, managerId)
-    put(DELIVERY_WORKER_ID, deliveryWorkerId)
-    put(COST, cost)
-    put(COUNT, count)
-    put(CREATED, created)
-    put(COMPLETED, completed)
-} }
-
-val Json.order get() = Order(
-    getTyped(ORDER_ID),
-    getTyped(CLIENT_ID)!!,
-    getTyped(MANAGER_ID),
-    getTyped(DELIVERY_WORKER_ID),
-    getTyped(COST)!!,
-    getTyped(COUNT)!!,
-    getTyped(CREATED)!!,
-    getTyped(COMPLETED)
-)
+) : IEntity { override val json get() = throw UnsupportedOperationException() }
 
 const val ORDER_ID = "orderId"
 const val CLIENT_ID = "clientId"
 const val MANAGER_ID = "managerId"
 const val DELIVERY_WORKER_ID = "deliveryWorkerId"
-const val CREATED = "created"
-const val COMPLETED = "completed"
+const val CREATED = "creationDatetime"
+const val COMPLETED = "completionDatetime"
 const val ORDERS = "orders"
 const val ORDER = "order"
 
