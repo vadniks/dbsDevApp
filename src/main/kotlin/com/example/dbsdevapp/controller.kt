@@ -87,6 +87,7 @@ class Controller(
     }
 
     @Suppress("NAME_SHADOWING")
+    @Transactional
     @PostMapping("/newOrder")
     fun newOrder(
         @RequestParam clientId: Int,
@@ -129,6 +130,7 @@ class Controller(
         return responseOk
     }
 
+    @Transactional
     @PostMapping("/completeOrder")
     fun completeOrder(
         @RequestHeader orderId: Int,
@@ -174,27 +176,48 @@ class Controller(
     fun getAllClients(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
     = emptyList<Json>().authenticated(MANAGER, credentials) { clientRepo.get().map { it.json } }
 
-    fun getAllOrders() {
+    @ResponseBody
+    @GetMapping("/getUserOrders")
+    fun getUserOrders(
+        @RequestParam clientId: Int,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String
+    ) = emptyList<Json>().authenticated(MANAGER, credentials) {
+        orderRepo.get(clientId)
+    }
 
+    @ResponseBody
+    @GetMapping("/getOrderedComponents")
+    fun getOrderedComponents(
+        @RequestParam orderId: Int,
+        @RequestParam clientId: Int,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String
+    ) = { boughtComponentRepo.get(orderId, clientId) }.apply {
+        null.authenticated(MANAGER, credentials, this)
+            ?: null.authenticated(DELIVERY_WORKER, credentials, this)
+            ?: emptyList<Json>()
     }
 
     // curl 'localhost:8080/component' -X PUT -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":2,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":10}'
-    @PutMapping(WHICH)
-    fun update(
-        @PathVariable which: String,
+    @PutMapping("/updateComponent")
+    fun updateComponent(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestBody json: Json
-    ): VoidResponse {
-        if (credentials != "admin:admin") return responseBadRequest
-        return if (when (which) {
-            COMPONENT -> componentRepo.update(json.component)
-            CLIENT -> clientRepo.update(json.client)
-            EMPLOYEE_INFO -> employeeInfoRepo.update(json.employeeInfo)
-//            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> false
-//            ORDER -> orderRepo.update(json.order)
-            else -> false
-        }) responseOk else responseBadRequest
-    }
+    ) = responseForbidden.authenticated(MANAGER, credentials)
+    { if (componentRepo.update(json.component)) responseOk else responseBadRequest }
+
+    @PutMapping("/updateClient")
+    fun updateClient(
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String,
+        @RequestBody json: Json
+    ) = responseForbidden.authenticated(CLIENT, credentials)
+    { if (clientRepo.update(json.client)) responseOk else responseBadRequest }
+
+    @PutMapping("/updateEmployee")
+    fun updateEmployee(
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String,
+        @RequestBody json: Json
+    ) = responseForbidden.authenticated(MANAGER, credentials)
+    { if (employeeInfoRepo.update(json.employeeInfo)) responseOk else responseBadRequest }
 
     // curl 'localhost:8080/component?id=2' -X DELETE -H 'Auth-credentials: admin:admin'
     @DeleteMapping(WHICH)

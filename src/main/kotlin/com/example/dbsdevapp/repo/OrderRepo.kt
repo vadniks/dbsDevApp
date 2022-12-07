@@ -21,7 +21,10 @@ class OrderRepo(
     fun get(orderId: Int, clientId: Int) = template.queryForObject(
         "select * from $ORDERS where $ORDER_ID = ? and $CLIENT_ID = ?", orderMapper, orderId, clientId)
 
-    fun get(): List<Order> = template.query("select * from $ORDERS", orderMapper)
+    fun get(clientId: Int): List<Order> = template.query(
+        "select * from $ORDERS where $CLIENT_ID = ?",
+        orderMapper, clientId
+    )
 
     fun get1(clientId: Int, created: Int) = template.queryForObject(
         "select * from $ORDERS where $CLIENT_ID = ? and $CREATED = ?", orderMapper, clientId, created)
