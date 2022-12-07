@@ -59,7 +59,8 @@ class Controller(
     fun newClient(@RequestBody json: Json)
     = if (clientRepo.insert(json.client)) responseOk else responseBadRequest
 
-    // curl 'localhost:8080/newEmployee' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"manager","surname":"_","phone":1000000001,"email":"client1@email.com","password":"pass","salary":100,"jobType":0}'
+    // curl 'localhost:8080/newEmployee' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"manager","surname":"_","phone":1000000001,"email":"manager@email.com","password":"pass","salary":100,"jobType":0}'
+    // curl 'localhost:8080/newEmployee' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"delivery","surname":"_","phone":1000000002,"email":"delivery@email.com","password":"pass","salary":100,"jobType":1}'
     @Transactional
     @PostMapping("/newEmployee")
     fun newEmployee(
