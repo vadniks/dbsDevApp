@@ -8,7 +8,6 @@ import kotlin.reflect.full.primaryConstructor
 interface IEmployee : IEntity {
     override val json get() = throw UnsupportedOperationException()
     val id: Int
-    val name get() = this::class.simpleName!!
 }
 
 data class Manager(override val id: Int) : IEmployee

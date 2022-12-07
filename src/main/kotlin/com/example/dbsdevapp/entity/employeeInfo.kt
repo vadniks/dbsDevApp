@@ -32,7 +32,7 @@ val Json.employeeInfo get() = EmployeeInfo(
     getTyped(EMAIL)!!,
     getTyped(PASSWORD)!!,
     getTyped(SALARY)!!,
-    getTyped(JOB_TYPE)!!
+    getTyped<Int?>(JOB_TYPE)?.jobType!!
 )
 
 const val EMPLOYEE_ID = "employeeId"

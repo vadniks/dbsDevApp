@@ -10,8 +10,8 @@ class EmployeesRepo(
     private val template: JdbcTemplate
 ) {
 
-    fun insert(employee: IEmployee)
-    = template.update("insert into ${employee.name}($EMPLOYEE_ID) values(?)", employee.id) == 1
+    fun insert(employee: IEmployee, table: String)
+    = template.update("insert into $table($EMPLOYEE_ID) values(?)", employee.id) == 1
 
     fun get(id: Int, which: String) = template.queryForObject(
         "select * from $which where $EMPLOYEE_ID = ?",

@@ -16,14 +16,14 @@ class EmployeeInfoRepo(
            values(?, ?, ?, ?, ?, ?, ?)""".trimMargin(),
         employeeInfo.name, employeeInfo.surname, employeeInfo.phone,
         employeeInfo.email, employeeInfo.password, employeeInfo.salary,
-        employeeInfo.jobType
+        employeeInfo.jobType.type
     ) == 1
 
     fun get(id: Int) = template.queryForObject(
         "select * from $EMPLOYEE_INFO where $EMPLOYEE_ID = ?", employeeInfoMapper, id)
 
     fun get(email: String) = template.queryForObject(
-        "select $EMPLOYEE_ID from $EMPLOYEE_INFO where $EMPLOYEE_ID = ?", Int::class.java)
+        "select $EMPLOYEE_ID from $EMPLOYEE_INFO where $EMAIL = ?", Int::class.java, email)
 
     fun get(name: String, password: String, jobType: JobType) = /*null.tryCatch { */template.queryForObject(
         "select * from $EMPLOYEE_INFO where $NAME = ? and $PASSWORD = ? and $JOB_TYPE = ?",

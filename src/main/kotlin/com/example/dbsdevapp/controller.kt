@@ -59,27 +59,25 @@ class Controller(
     fun newClient(@RequestBody json: Json)
     = if (clientRepo.insert(json.client)) responseOk else responseBadRequest
 
+    // curl 'localhost:8080/newEmployee' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"employeeId":null,"name":"manager","surname":"_","phone":1000000001,"email":"client1@email.com","password":"pass","salary":100,"jobType":0}'
     @Transactional
     @PostMapping("/newEmployee")
     fun newEmployee(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestBody json: Json
-    ): VoidResponse {
-        if (credentials != "admin:admin") return responseBadRequest
+    ) = responseForbidden.authenticated(MANAGER, credentials) {
+        val employeeInfo = json.employeeInfo
 
-        val employeeInfo = try { json.employeeInfo } 
-        catch (_: Exception) { null } ?: return responseBadRequest
-log.info("rrdd")
         if (!employeeInfoRepo.insert(employeeInfo))
-            return responseBadRequest
+            return@authenticated responseBadRequest
 
         val employeeId = employeeInfoRepo.get(employeeInfo.email)
-            ?: return responseBadRequest
+            ?: return@authenticated responseBadRequest
 
-        return if (employeesRepo.insert(when (employeeInfo.jobType) {
-            JobType.MANAGER -> Manager(employeeId)
-            JobType.DELIVERY_WORKER -> DeliveryWorker(employeeId)
-        })) responseOk else responseBadRequest
+        if (when (employeeInfo.jobType) {
+            JobType.MANAGER -> employeesRepo.insert(Manager(employeeId), MANAGERS)
+            JobType.DELIVERY_WORKER -> employeesRepo.insert(DeliveryWorker(employeeId), DELIVERY_WORKERS)
+        }) responseOk else responseBadRequest
     }
 
     @Suppress("NAME_SHADOWING")
