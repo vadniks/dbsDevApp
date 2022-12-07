@@ -116,8 +116,8 @@ class Controller(
 
         if (!orderRepo.insert(Order(
             null, client.id!!,
-            random.nextInt(employeesRepo.get(MANAGER).size),
-            random.nextInt(employeesRepo.get(DELIVERY_WORKER).size),
+            random.nextInt(employeesRepo.get(MANAGERS).size),
+            random.nextInt(employeesRepo.get(DELIVERY_WORKERS).size),
             cost, count, created, null
         ))) return responseBadRequest
 
@@ -220,20 +220,51 @@ class Controller(
     { if (employeeInfoRepo.update(json.employeeInfo)) responseOk else responseBadRequest }
 
     // curl 'localhost:8080/component?id=2' -X DELETE -H 'Auth-credentials: admin:admin'
-    @DeleteMapping(WHICH)
-    fun delete(
-        @PathVariable which: String,
+    @DeleteMapping("/deleteComponent")
+    fun deleteComponent(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestParam id: Int
-    ): VoidResponse {
-        if (credentials != "admin:admin") return responseBadRequest
-        return if (when (which) {
-            COMPONENT -> componentRepo.delete(id)
-            CLIENT -> clientRepo.delete(id)
-//            EMPLOYEE_INFO -> clientRepo.delete(id)
-//            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.delete(id, which)
-//            ORDER -> orderRepo.delete(id)
-            else -> false
-        }) responseOk else responseBadRequest
+    ) = responseForbidden.authenticated(MANAGER, credentials) {
+        for (boughtComponent in boughtComponentRepo.get(id))
+            boughtComponentRepo.delete(boughtComponent)
+        componentRepo.delete(id)
+    }
+
+    @DeleteMapping("/deleteClient")
+    fun deleteClient(
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String,
+        @RequestParam id: Int
+    ) = responseForbidden.authenticated(MANAGER, credentials) {
+        var result = false
+        for (order in orderRepo.get(id)) {
+            for (boughtComponent in boughtComponentRepo.get(order.orderId!!, order.clientId))
+                boughtComponentRepo.delete(boughtComponent)
+            result = orderRepo.delete(order.orderId, order.clientId)
+        }
+        if (result) responseOk else responseBadRequest
+    }
+
+    @DeleteMapping("/deleteEmployee")
+    fun deleteEmployee(
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String,
+        @RequestParam id: Int
+    ) = responseForbidden.authenticated(MANAGER, credentials) {
+        val employeeInfo = employeeInfoRepo.get(id) ?: return@authenticated responseBadRequest
+
+        for (order in orderRepo.get(id, employeeInfo.jobType.table))
+            orderRepo.setEmployeeId(order.orderId!!, order.clientId, null, employeeInfo.jobType.job)
+
+        employeesRepo.delete(id, employeeInfo.jobType.table)
+        employeeInfoRepo.delete(id)
+    }
+
+    fun deleteOrder(
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String,
+        @RequestParam orderId: Int,
+        @RequestParam clientId: Int
+    ) = responseForbidden.authenticated(MANAGER, credentials) {
+        for (i in boughtComponentRepo.get(orderId, clientId))
+            boughtComponentRepo.delete(i)
+        orderRepo.delete(orderId, clientId)
     }
 }

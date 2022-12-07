@@ -15,7 +15,9 @@ data class Manager(override val id: Int) : IEmployee
 data class DeliveryWorker(override val id: Int) : IEmployee
 
 const val MANAGER = "manager"
+const val MANAGERS = "managers"
 const val DELIVERY_WORKER = "deliveryWorker"
+const val DELIVERY_WORKERS = "deliveryWorkers"
 
 private fun <T : IEmployee> employeeMapper(clazz: KClass<T>, resultSet: ResultSet) =
     clazz.primaryConstructor?.call(resultSet.getNullableInt(EMPLOYEE_ID)!!)!!

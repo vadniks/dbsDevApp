@@ -19,7 +19,7 @@ class EmployeesRepo(
     )
 
     fun get(which: String): List<IEmployee> = template.query(
-        "select * from $EMPLOYEE_INFO",
+        "select * from $which",
         employeeMappers.employee(which)
     )
 

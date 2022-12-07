@@ -22,7 +22,13 @@ class BoughtComponentRepo(
         orderId, clientId
     )
 
-    fun get(): List<BoughtComponent> = template.query("select * from $BOUGHT_COMPONENTS", boughtComponentMapper)
+    fun get(componentId: Int): List<BoughtComponent> = template.query(
+        "select * from $BOUGHT_COMPONENTS where $COMPONENT_ID = ?",
+        boughtComponentMapper, componentId
+    )
 
-    fun delete(id: Int) = template.update("delete from $BOUGHT_COMPONENTS where $CLIENT_ID = ?", id) == 1
+    fun delete(boughtComponent: BoughtComponent) = template.update(
+        "delete from $BOUGHT_COMPONENTS where $COMPONENT_ID = ? and $ORDER_ID = ? and $CLIENT_ID = ?",
+        boughtComponent.componentId, boughtComponent.orderId, boughtComponent.clientId
+    ) == 1
 }

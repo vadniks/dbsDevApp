@@ -42,8 +42,7 @@ const val EMPLOYEE_INFO = "employeeInfo"
 
 enum class JobType(val type: Int) {
     MANAGER(0),
-    DELIVERY_WORKER(1),
-    ADMINISTRATOR(2)
+    DELIVERY_WORKER(1)
 }
 
 val Int.jobType get() = JobType.values().find { it.type == this }
@@ -52,6 +51,16 @@ val String.jobType get() = when (this) {
     MANAGER -> JobType.MANAGER
     DELIVERY_WORKER -> JobType.DELIVERY_WORKER
     else -> null
+}
+
+val JobType.table get() = when (this) {
+    JobType.MANAGER -> MANAGERS
+    JobType.DELIVERY_WORKER -> DELIVERY_WORKERS
+}
+
+val JobType.job get() = when (this) {
+    JobType.MANAGER -> MANAGER
+    JobType.DELIVERY_WORKER -> DELIVERY_WORKER
 }
 
 val employeeInfoMapper = RowMapper<EmployeeInfo> { resultSet, _ -> EmployeeInfo(

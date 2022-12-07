@@ -7,8 +7,8 @@ import org.springframework.jdbc.core.RowMapper
 data class Order(
     val orderId: Int?,
     val clientId: Int,
-    val managerId: Int,
-    val deliveryWorkerId: Int,
+    val managerId: Int?,
+    val deliveryWorkerId: Int?,
     val cost: Int,
     val count: Int,
     val created: Int,
@@ -27,8 +27,8 @@ data class Order(
 val Json.order get() = Order(
     getTyped(ORDER_ID),
     getTyped(CLIENT_ID)!!,
-    getTyped(MANAGER_ID)!!,
-    getTyped(DELIVERY_WORKER_ID)!!,
+    getTyped(MANAGER_ID),
+    getTyped(DELIVERY_WORKER_ID),
     getTyped(COST)!!,
     getTyped(COUNT)!!,
     getTyped(CREATED)!!,
@@ -45,10 +45,10 @@ const val ORDERS = "orders"
 const val ORDER = "order"
 
 val orderMapper = RowMapper<Order> { resultSet, _ -> Order(
-    resultSet.getNullableInt(ORDER_ID)!!,
+    resultSet.getNullableInt(ORDER_ID),
     resultSet.getNullableInt(CLIENT_ID)!!,
-    resultSet.getNullableInt(MANAGER_ID)!!,
-    resultSet.getNullableInt(DELIVERY_WORKER_ID)!!,
+    resultSet.getNullableInt(MANAGER_ID),
+    resultSet.getNullableInt(DELIVERY_WORKER_ID),
     resultSet.getNullableInt(COST)!!,
     resultSet.getNullableInt(COUNT)!!,
     resultSet.getNullableInt(CREATED)!!,
