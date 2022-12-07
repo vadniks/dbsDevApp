@@ -11,11 +11,22 @@ select * from employeeInfo;
 select * from managers;
 select * from deliveryWorkers;
 select * from boughtComponents;
+select * from orders;
 delete from components where components.componentId > 0;
 
 insert into employeeInfo(name, surname, phone, email, password, salary, jobType) values(
                                                                                            'admin', '_', 0000000000, 'admin@localhost.8080', 'admin', 0, 0);
 insert into managers(employeeId) values(1);
+
+insert into components(componentid, name, type, description, cost, count) values(
+                                                                                    1, 'a', 0, 'aa', 1000, 10);
+insert into components(componentid, name, type, description, cost, count) values(
+                                                                                    2, 'b', 1, 'bb', 1000, 10);
+insert into components(componentid, name, type, description, cost, count) values(
+                                                                                    3, 'c', 2, 'cc', 1000, 10);
+
+insert into boughtComponents(componentId, orderId, clientId) values(1, 4, 1);
+insert into boughtComponents(componentId, orderId, clientId) values(2, 4, 1);
 
 create table components(
                            componentId integer unsigned not null auto_increment unique,

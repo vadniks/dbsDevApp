@@ -37,7 +37,7 @@ class EmployeeInfoRepo(
         """update $EMPLOYEE_INFO set $NAME = ?, $SURNAME = ?, $PHONE = ?, $EMAIL = ?, $PASSWORD = ?, $SALARY = ?, $JOB_TYPE = ?
            where $EMPLOYEE_ID = ?""".trimMargin(),
         employeeInfo.name, employeeInfo.surname, employeeInfo.phone, employeeInfo.email,
-        employeeInfo.password, employeeInfo.salary, employeeInfo.jobType, employeeInfo.id
+        employeeInfo.password, employeeInfo.salary, employeeInfo.jobType.type, employeeInfo.id
     ) == 1
 
     fun delete(id: Int) = template.update("delete from $EMPLOYEE_INFO where $EMPLOYEE_ID = ?", id) == 1

@@ -115,9 +115,10 @@ class Controller(
 
         val orderId = orderRepo.get1(clientId, created)?.orderId ?: return responseBadRequest
 
-        for (i in componentIds)
-            if (!boughtComponentRepo.insert(BoughtComponent(i, orderId, clientId)))
-                return responseBadRequest
+        for (i in componentIds) if (
+            !boughtComponentRepo.insert(BoughtComponent(i, orderId, clientId))
+            || !componentRepo.decreaseCount(i)
+        ) return responseBadRequest
 
         return responseOk
     }
@@ -214,10 +215,10 @@ class Controller(
         null.authenticated(MANAGER, credentials, this)
             ?: null.authenticated(DELIVERY_WORKER, credentials, this)
             ?: null.authenticated(CLIENT, credentials, this)
-            ?: emptyList<Json>()
+            ?: emptyList()
     }
 
-    // curl 'localhost:8080/component' -X PUT -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":2,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":10}'
+    // curl 'localhost:8080/updateComponent' -X PUT -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":3,"name":"aa@","type":1,"description":"bb_","cost":10,"image":null,"count":1}'
     @PutMapping("/updateComponent")
     fun updateComponent(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
@@ -225,6 +226,7 @@ class Controller(
     ) = responseForbidden.authenticated(MANAGER, credentials)
     { if (componentRepo.update(json.component)) responseOk else responseBadRequest }
 
+    // curl 'localhost:8080/updateClient' -X PUT -H 'Auth-credentials: client1:pass' -H 'Content-Type: application/json' -d '{"clientId":1,"name":"client1","surname":"$","phone":1000000000,"address":"@","email":"client1@email.com","password":"pass"}'
     @PutMapping("/updateClient")
     fun updateClient(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
@@ -232,6 +234,7 @@ class Controller(
     ) = responseForbidden.authenticated(CLIENT, credentials)
     { if (clientRepo.update(json.client)) responseOk else responseBadRequest }
 
+    // curl 'localhost:8080/updateEmployee' -X PUT -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"employeeId":6,"name":"manager","surname":"_","phone":1000000001,"email":"manager@email.com","password":"pass","salary":100,"jobType":0}'
     @PutMapping("/updateEmployee")
     fun updateEmployee(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
@@ -239,7 +242,7 @@ class Controller(
     ) = responseForbidden.authenticated(MANAGER, credentials)
     { if (employeeInfoRepo.update(json.employeeInfo)) responseOk else responseBadRequest }
 
-    // curl 'localhost:8080/component?id=2' -X DELETE -H 'Auth-credentials: admin:admin'
+    // curl 'localhost:8080/deleteComponent?id=3' -X DELETE -H 'Auth-credentials: admin:admin'
     @Transactional
     @DeleteMapping("/deleteComponent")
     fun deleteComponent(
@@ -247,8 +250,8 @@ class Controller(
         @RequestParam id: Int
     ) = responseForbidden.authenticated(MANAGER, credentials) {
         for (boughtComponent in boughtComponentRepo.get(id))
-            boughtComponentRepo.delete(boughtComponent)
-        componentRepo.delete(id)
+            if (!boughtComponentRepo.delete(boughtComponent)) return@authenticated responseBadRequest
+        if (componentRepo.delete(id)) responseOk else responseBadRequest
     }
 
     @Transactional
