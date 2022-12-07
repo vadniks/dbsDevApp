@@ -50,7 +50,7 @@ class OrderRepo(
 
     fun countAll() = SimpleJdbcCall(template)
         .withProcedureName("countOrders")
-        .execute()["count"]
+        .execute()["count"] as Int
 
     fun assignEmployeesToOrder(
         orderId: Int,
