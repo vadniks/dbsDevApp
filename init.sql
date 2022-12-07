@@ -63,6 +63,7 @@ values(1, null, null, 100, 3, 123);
 # curl 'localhost:8080/getOrderedComponents?orderId=1&clientId=1' -H 'Auth-credentials: delivery1:pass'
 # curl 'localhost:8080/getEmployeeIdByEmail?email=manager@a.a' -H 'Auth-credentials: manager:pass'
 # curl 'localhost:8080/countOrders' -H 'Auth-credentials: manager:pass'
+# curl 'localhost:8080/sumOrders' -H 'Auth-credentials: manager:pass'
 
 -- -------------------------------------------------------------------------------------------
 
@@ -199,12 +200,20 @@ call countOrders(@count);
 select @count;
 
 delimiter $$
-create function getEmployeeIdByEmail($email varchar(32)) returns int(6) reads sql data begin
+create function getEmployeeIdByEmail($email varchar(255)) returns int(6) reads sql data begin
     set @id = (select employeeId from employeeInfo where email = $email);
     return @id;
 end$$
 delimiter ;
 select getEmployeeIdByEmail('manager@email.com');
+
+delimiter $$
+create function sumOrders() returns int(6) reads sql data begin
+    set @sum = (select sum(cost) from orders);
+    return @sum;
+end$$
+delimiter ;
+select sumOrders();
 
 delimiter $$
 create procedure addManager(

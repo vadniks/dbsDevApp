@@ -52,6 +52,8 @@ class OrderRepo(
         .withProcedureName("countOrders")
         .execute()["count"] as Int
 
+    fun sumAll() = template.queryForObject("select sumOrders()", Int::class.java)
+
     fun assignEmployeesToOrder(
         orderId: Int,
         clientId: Int,

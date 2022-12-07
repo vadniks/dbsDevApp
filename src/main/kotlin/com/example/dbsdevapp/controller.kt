@@ -230,6 +230,11 @@ class Controller(
     fun countOrders(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
     = null.authenticated(MANAGER, credentials) { orderRepo.countAll() }
 
+    // curl 'localhost:8080/sumOrders' -H 'Auth-credentials: manager:pass'
+    @GetMapping("/sumOrders")
+    fun sumOrders(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
+    = null.authenticated(MANAGER, credentials) { orderRepo.sumAll() }
+
     // curl 'localhost:8080/updateComponent' -X PUT -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":3,"name":"aa@","type":1,"description":"bb_","cost":10,"image":null,"count":1}'
     @PutMapping("/updateComponent")
     fun updateComponent(
