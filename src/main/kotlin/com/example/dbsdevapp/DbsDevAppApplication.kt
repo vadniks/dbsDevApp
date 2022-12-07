@@ -17,7 +17,7 @@ val log = Logger.getLogger("a")
 fun main(vararg args: String) = SpringApplication(DbsDevAppApplication::class.java).apply {
     setDefaultProperties(Properties().apply {
         setProperty("spring.datasource.url", "jdbc:mysql://localhost:3306/db")
-        setProperty("spring.datasource.username", "root")
-        setProperty("spring.datasource.password", "root")
+        setProperty("spring.datasource.username", "server")
+        setProperty("spring.datasource.password", "server")
     })
 }.run(*args).unit

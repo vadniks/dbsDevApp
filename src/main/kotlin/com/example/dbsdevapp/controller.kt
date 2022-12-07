@@ -54,14 +54,14 @@ class Controller(
     ) = responseForbidden.authenticated(MANAGER, credentials)
     { if (componentRepo.insert(json.component)) responseOk else responseBadRequest }
 
+    // curl 'localhost:8080/newClient' -H 'Content-Type: application/json' -d '{"clientId":null,"name":"client1","surname":"_","phone":1000000000,"address":"_","email":"client1@email.com","password":"pass"}'
     @PostMapping("/newClient")
     fun newClient(@RequestBody json: Json)
-    = if (componentRepo.insert(json.component)) responseOk else responseBadRequest
+    = if (clientRepo.insert(json.client)) responseOk else responseBadRequest
 
     @Transactional
     @PostMapping("/newEmployee")
     fun newEmployee(
-        @RequestParam which: String,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestBody json: Json
     ): VoidResponse {
@@ -69,20 +69,16 @@ class Controller(
 
         val employeeInfo = try { json.employeeInfo } 
         catch (_: Exception) { null } ?: return responseBadRequest
-
-        if (employeeInfo.jobType != which.jobType)
-            return responseBadRequest
-
+log.info("rrdd")
         if (!employeeInfoRepo.insert(employeeInfo))
             return responseBadRequest
 
         val employeeId = employeeInfoRepo.get(employeeInfo.email)
             ?: return responseBadRequest
 
-        return if (employeesRepo.insert(when (which) {
-            MANAGER -> Manager(employeeId)
-            DELIVERY_WORKER -> DeliveryWorker(employeeId)
-            else -> return responseBadRequest
+        return if (employeesRepo.insert(when (employeeInfo.jobType) {
+            JobType.MANAGER -> Manager(employeeId)
+            JobType.DELIVERY_WORKER -> DeliveryWorker(employeeId)
         })) responseOk else responseBadRequest
     }
 
@@ -220,6 +216,7 @@ class Controller(
     { if (employeeInfoRepo.update(json.employeeInfo)) responseOk else responseBadRequest }
 
     // curl 'localhost:8080/component?id=2' -X DELETE -H 'Auth-credentials: admin:admin'
+    @Transactional
     @DeleteMapping("/deleteComponent")
     fun deleteComponent(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
@@ -230,6 +227,7 @@ class Controller(
         componentRepo.delete(id)
     }
 
+    @Transactional
     @DeleteMapping("/deleteClient")
     fun deleteClient(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
@@ -244,6 +242,7 @@ class Controller(
         if (result) responseOk else responseBadRequest
     }
 
+    @Transactional
     @DeleteMapping("/deleteEmployee")
     fun deleteEmployee(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
@@ -258,6 +257,7 @@ class Controller(
         employeeInfoRepo.delete(id)
     }
 
+    @Transactional
     @DeleteMapping("/deleteOrder")
     fun deleteOrder(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
