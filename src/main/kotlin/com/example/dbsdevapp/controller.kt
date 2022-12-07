@@ -46,7 +46,7 @@ class Controller(
     private inline fun <T> T.authenticated(role: String, credentials: String, crossinline action: () -> T)
     = if (checkRoleCredentials(role, credentials)) action() else this
 
-    // curl 'localhost:8080/component' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":1}'
+    // curl 'localhost:8080/newComponent' -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":null,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":1}'
     @PostMapping("/newComponent")
     fun newComponent(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
@@ -172,7 +172,7 @@ class Controller(
     fun getAllComponents() = componentRepo.get().map { it.json }
 
     @ResponseBody
-    @GetMapping("/getAllComponents")
+    @GetMapping("/getAllClients")
     fun getAllClients(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
     = emptyList<Json>().authenticated(MANAGER, credentials) { clientRepo.get().map { it.json } }
 
@@ -258,6 +258,7 @@ class Controller(
         employeeInfoRepo.delete(id)
     }
 
+    @DeleteMapping("/deleteOrder")
     fun deleteOrder(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestParam orderId: Int,

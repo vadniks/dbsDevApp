@@ -1,6 +1,7 @@
 package com.example.dbsdevapp.repo
 
 import com.example.dbsdevapp.entity.*
+import com.example.dbsdevapp.tryCatch
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 
@@ -24,7 +25,7 @@ class EmployeeInfoRepo(
     fun get(email: String) = template.queryForObject(
         "select $EMPLOYEE_ID from $EMPLOYEE_INFO where $EMPLOYEE_ID = ?", Int::class.java)
 
-    fun get(name: String, password: String, jobType: JobType) = template.queryForObject(
+    fun get(name: String, password: String, jobType: JobType) = /*null.tryCatch { */template.queryForObject(
         "select * from $EMPLOYEE_INFO where $NAME = ? and $PASSWORD = ? and $JOB_TYPE = ?",
         employeeInfoMapper,
         name, password, jobType.type
