@@ -14,6 +14,8 @@ select * from boughtComponents;
 select * from orders;
 delete from components where components.componentId > 0;
 
+update orders set managerId = 1 where orderId = 4;
+
 insert into employeeInfo(name, surname, phone, email, password, salary, jobType) values(
                                                                                            'admin', '_', 0000000000, 'admin@localhost.8080', 'admin', 0, 0);
 insert into managers(employeeId) values(1);
@@ -27,6 +29,9 @@ insert into components(componentid, name, type, description, cost, count) values
 
 insert into boughtComponents(componentId, orderId, clientId) values(1, 4, 1);
 insert into boughtComponents(componentId, orderId, clientId) values(2, 4, 1);
+
+insert into orders(clientId, managerId, deliveryWorkerId, cost, count, creationDatetime)
+values(1, null, null, 100, 3, 123);
 
 create table components(
                            componentId integer unsigned not null auto_increment unique,
@@ -159,9 +164,12 @@ create procedure _select(which int(1)) begin case which
     end case; end$$
 delimiter ;
 
+drop procedure countOrders;
 delimiter $$
-create procedure countOrders() begin select count(*) from orders; end$$
+create procedure countOrders(out count integer) begin select count(*) into count from orders; end$$
 delimiter ;
+call countOrders(@count);
+select @count;
 
 delimiter $$
 create function getEmployeeIdByEmail($email varchar(32)) returns int(6) reads sql data begin

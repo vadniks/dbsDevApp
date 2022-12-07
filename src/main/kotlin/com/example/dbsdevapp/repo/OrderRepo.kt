@@ -48,17 +48,9 @@ class OrderRepo(
         orderMapper, employeeId
     )
 
-    fun countAll() = (((SimpleJdbcCall(template)
+    fun countAll() = SimpleJdbcCall(template)
         .withProcedureName("countOrders")
-        .execute()
-        .values
-        .iterator()
-        .next() as List<*>)[0]!! as Map<*, *>)
-        .values
-        .iterator()
-        .next() as Long)
-        .toInt()
-        .absoluteValue
+        .execute()["count"]
 
     fun assignEmployeesToOrder(
         orderId: Int,
