@@ -18,8 +18,8 @@ class OrderRepo(
         order.completed
     ) == 1
 
-    fun get(id: Int) = template.queryForObject(
-        "select * from $ORDERS where $ORDER_ID = ?", orderMapper, id)
+    fun get(orderId: Int, clientId: Int) = template.queryForObject(
+        "select * from $ORDERS where $ORDER_ID = ? and $CLIENT_ID = ?", orderMapper, orderId, clientId)
 
     fun get(): List<Order> = template.query("select * from $ORDERS", orderMapper)
 
@@ -29,6 +29,11 @@ class OrderRepo(
         order.clientId, order.managerId, order.deliveryWorkerId,
         order.cost, order.count, order.created,
         order.completed
+    ) == 1
+
+    fun completeOrder(orderId: Int, clientId: Int, completed: Int) = template.update(
+        "update $ORDERS set $COMPLETED = ? where $ORDER_ID = ? and $CLIENT_ID = ?",
+        completed, orderId, clientId
     ) == 1
 
     fun delete(id: Int) = template.update("delete from $ORDERS where $ORDER_ID = ?", id) == 1

@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
+import kotlin.random.Random
 import kotlin.reflect.KClass
 
 private typealias VoidResponse = ResponseEntity<Void>
@@ -85,12 +86,19 @@ class Controller(
         })) responseOk else responseBadRequest
     }
 
+    @Suppress("NAME_SHADOWING")
     @PostMapping("/newOrder")
     fun newOrder(
         @RequestParam clientId: Int,
-        @RequestParam componentIds: IntArray
+        @RequestParam componentIds: IntArray,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String
     ): VoidResponse {
         val client = clientRepo.get(clientId) ?: return responseBadRequest
+
+        val credentials = credentials.split(':')
+        if (client.name != credentials[0] || client.password != credentials[1])
+            return responseForbidden
+
         val components = ArrayList<Component>()
         var cost = 0
         var count = 0
@@ -102,7 +110,28 @@ class Controller(
             count++
         }
 
+        val created = System.currentTimeMillis().toUInt().toInt()
+        val random = Random(created)
 
+        return if (orderRepo.insert(Order(
+            null, client.id!!,
+            random.nextInt(employeesRepo.get(MANAGER).size),
+            random.nextInt(employeesRepo.get(DELIVERY_WORKER).size),
+            cost, count, created, null
+        ))) responseOk else responseBadRequest
+    }
+
+    @PostMapping("/completeOrder")
+    fun completeOrder(
+        @RequestHeader orderId: Int,
+        @RequestParam clientId: Int,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String
+    ) = responseForbidden.authenticated(MANAGER, credentials) {
+        orderRepo.get(orderId, clientId) ?: return@authenticated responseBadRequest
+        if (orderRepo.completeOrder(orderId, clientId, System.currentTimeMillis().toUInt().toInt()))
+            responseOk
+        else
+            responseBadRequest
     }
 
     // curl 'localhost:8080/component?id=1' -H 'Auth-credentials: admin:admin'

@@ -21,13 +21,13 @@ class BoughtComponentRepo(
 
     fun get(): List<BoughtComponent> = template.query("select * from $BOUGHT_COMPONENTS", boughtComponentMapper)
 
-    fun update(boughtComponent: BoughtComponent) = template.update(
-        """update $BOUGHT_COMPONENTS set $NAME = ?, $SURNAME = ?, $PHONE = ?, $ADDRESS = ?, $EMAIL = ?, $PASSWORD = ?
-           where $CLIENT_ID = ?""".trimMargin(),
-        boughtComponent.name, boughtComponent.surname, boughtComponent.phone,
-        boughtComponent.address, boughtComponent.email, boughtComponent.password,
-        boughtComponent.id
-    ) == 1
+//    fun update(boughtComponent: BoughtComponent) = template.update(
+//        """update $BOUGHT_COMPONENTS set $NAME = ?, $SURNAME = ?, $PHONE = ?, $ADDRESS = ?, $EMAIL = ?, $PASSWORD = ?
+//           where $CLIENT_ID = ?""".trimMargin(),
+//        boughtComponent.name, boughtComponent.surname, boughtComponent.phone,
+//        boughtComponent.address, boughtComponent.email, boughtComponent.password,
+//        boughtComponent.id
+//    ) == 1
 
     fun delete(id: Int) = template.update("delete from $BOUGHT_COMPONENTS where $CLIENT_ID = ?", id) == 1
 }

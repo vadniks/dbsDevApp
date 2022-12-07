@@ -51,7 +51,6 @@ val Int.jobType get() = JobType.values().find { it.type == this }
 val String.jobType get() = when (this) {
     MANAGER -> JobType.MANAGER
     DELIVERY_WORKER -> JobType.DELIVERY_WORKER
-    ADMINISTRATOR -> JobType.ADMINISTRATOR
     else -> null
 }
 

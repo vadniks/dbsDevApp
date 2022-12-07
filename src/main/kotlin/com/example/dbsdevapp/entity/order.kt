@@ -5,7 +5,7 @@ import com.example.dbsdevapp.getTyped
 import org.springframework.jdbc.core.RowMapper
 
 data class Order(
-    val orderId: Int,
+    val orderId: Int?,
     val clientId: Int,
     val managerId: Int,
     val deliveryWorkerId: Int,
@@ -25,7 +25,7 @@ data class Order(
 } }
 
 val Json.order get() = Order(
-    getTyped(ORDER_ID)!!,
+    getTyped(ORDER_ID),
     getTyped(CLIENT_ID)!!,
     getTyped(MANAGER_ID)!!,
     getTyped(DELIVERY_WORKER_ID)!!,
