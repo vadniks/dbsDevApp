@@ -50,11 +50,11 @@ class Controller(
     fun newComponent(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestBody json: Json
-    ): VoidResponse = responseForbidden.authenticated(MANAGER, credentials)
+    ) = responseForbidden.authenticated(MANAGER, credentials)
     { if (componentRepo.insert(json.component)) responseOk else responseBadRequest }
 
     @PostMapping("/newClient")
-    fun newClient(@RequestBody json: Json): VoidResponse
+    fun newClient(@RequestBody json: Json)
     = if (componentRepo.insert(json.component)) responseOk else responseBadRequest
 
     @Transactional
@@ -85,43 +85,60 @@ class Controller(
         })) responseOk else responseBadRequest
     }
 
+    @PostMapping("/newOrder")
+    fun newOrder(
+        @RequestParam clientId: Int,
+        @RequestParam componentIds: IntArray
+    ): VoidResponse {
+        val client = clientRepo.get(clientId) ?: return responseBadRequest
+        val components = ArrayList<Component>()
+        var cost = 0
+        var count = 0
 
+        for (i in componentIds) {
+            val component = componentRepo.get(i)
+            components.add(component ?: return responseBadRequest)
+            cost += component.cost
+            count++
+        }
+
+
+    }
 
     // curl 'localhost:8080/component?id=1' -H 'Auth-credentials: admin:admin'
     @ResponseBody
-    @GetMapping(WHICH)
-    fun get(
-        @PathVariable which: String,
-        @RequestHeader(AUTH_CREDENTIALS) credentials: String,
-        @RequestParam id: Int
-    ): Json? {
-        if (credentials != "admin:admin") return null
-        return when (which) {
-            COMPONENT -> componentRepo.get(id)
-            CLIENT -> clientRepo.get(id)
-//            EMPLOYEE_INFO -> employeeInfoRepo.get(id)
-//            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.get(id, which)
-//            ORDER -> orderRepo.get(id)
-            else -> null
-        }?.json
+    @GetMapping("/getComponent")
+    fun getComponent(@RequestParam id: Int) = componentRepo.get(id)?.json
+
+    @ResponseBody
+    @GetMapping("/getClient")
+    fun getClient(
+        @RequestParam id: Int,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String
+    ) = { clientRepo.get(id)?.json }.run {
+        null.authenticated(DELIVERY_WORKER, credentials, this)
+            ?: null.authenticated(MANAGER, credentials, this)
     }
+
+    @ResponseBody
+    @GetMapping("/getEmployee")
+    fun getEmployee(
+        @RequestParam id: Int,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String
+    ) = null.authenticated(MANAGER, credentials) { employeeInfoRepo.get(id) }
 
     // curl 'localhost:8080/all/component' -H 'Auth-credentials: admin:admin'
     @ResponseBody
-    @GetMapping("/all$WHICH")
-    fun getAll(
-        @PathVariable which: String,
-        @RequestHeader(AUTH_CREDENTIALS) credentials: String
-    ): List<Json> {
-        if (credentials != "admin:admin") return emptyList()
-        return when (which) {
-            COMPONENT -> componentRepo.get()
-            CLIENT -> clientRepo.get()
-            EMPLOYEE_INFO -> employeeInfoRepo.get()
-            MANAGER, DELIVERY_WORKER, ADMINISTRATOR -> employeesRepo.get(which)
-            ORDER -> orderRepo.get()
-            else -> emptyList()
-        }.map { it.json }
+    @GetMapping("/getAllComponents")
+    fun getAllComponents() = componentRepo.get().map { it.json }
+
+    @ResponseBody
+    @GetMapping("/getAllComponents")
+    fun getAllClients(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
+    = emptyList<Json>().authenticated(MANAGER, credentials) { clientRepo.get().map { it.json } }
+
+    fun getAllOrders() {
+
     }
 
     // curl 'localhost:8080/component' -X PUT -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":2,"name":"aa","type":1,"description":"bb","cost":10,"image":null,"count":10}'
