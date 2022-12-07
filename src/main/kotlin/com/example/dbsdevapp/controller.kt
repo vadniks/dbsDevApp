@@ -218,6 +218,7 @@ class Controller(
             ?: emptyList()
     }
 
+    // curl 'localhost:8080/countOrders' -H 'Auth-credentials: manager:pass'
     @GetMapping("/countOrders")
     fun countOrders(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
     = null.authenticated(MANAGER, credentials) { orderRepo.countAll() }
