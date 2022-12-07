@@ -125,6 +125,7 @@ class Controller(
         return responseOk
     }
 
+    // curl 'localhost:8080/assignEmployeesToOrder?orderId=4&clientId=1&managerId=1&deliveryWorkerId=7' -X POST -H 'Auth-credentials: manager:pass'
     @Transactional
     @PostMapping("/assignEmployeesToOrder")
     fun assignEmployeesToOrder(
@@ -138,21 +139,22 @@ class Controller(
         else responseBadRequest
     }
 
+    // curl 'localhost:8080/completeOrder?orderId=4&clientId=1' -X POST -H 'Auth-credentials: manager:pass'
     @Transactional
     @PostMapping("/completeOrder")
     fun completeOrder(
-        @RequestHeader orderId: Int,
+        @RequestParam orderId: Int,
         @RequestParam clientId: Int,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
     ) = responseForbidden.authenticated(MANAGER, credentials) {
         orderRepo.get(orderId, clientId) ?: return@authenticated responseBadRequest
-        if (orderRepo.completeOrder(orderId, clientId, System.currentTimeMillis().toUInt().toInt()))
+        if (orderRepo.completeOrder(orderId, clientId, System.currentTimeMillis().toInt().absoluteValue))
             responseOk
         else
             responseBadRequest
     }
 
-    // curl 'localhost:8080/component?id=1' -H 'Auth-credentials: admin:admin'
+    // curl 'localhost:8080/getComponent?id=3'
     @ResponseBody
     @GetMapping("/getComponent")
     fun getComponent(@RequestParam id: Int) = componentRepo.get(id)?.json
