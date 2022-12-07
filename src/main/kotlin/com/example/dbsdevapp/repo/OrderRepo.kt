@@ -52,6 +52,16 @@ class OrderRepo(
         order.completed
     ) == 1
 
+    fun assignEmployeesToOrder(
+        orderId: Int,
+        clientId: Int,
+        managerId: Int,
+        deliveryWorkerId: Int
+    ) = template.update(
+        "update $ORDERS set $MANAGER_ID = ?, $DELIVERY_WORKER_ID = ? where $ORDER_ID = ? and $CLIENT_ID = ?",
+        managerId, deliveryWorkerId, orderId, clientId
+    ) == 1
+
     fun completeOrder(orderId: Int, clientId: Int, completed: Int) = template.update(
         "update $ORDERS set $COMPLETED = ? where $ORDER_ID = ? and $CLIENT_ID = ?",
         completed, orderId, clientId

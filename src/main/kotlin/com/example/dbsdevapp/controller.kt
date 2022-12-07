@@ -126,6 +126,19 @@ class Controller(
     }
 
     @Transactional
+    @PostMapping("/assignEmployeesToOrder")
+    fun assignEmployeesToOrder(
+        @RequestParam orderId: Int,
+        @RequestParam clientId: Int,
+        @RequestParam managerId: Int,
+        @RequestParam deliveryWorkerId: Int,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String
+    ): VoidResponse = responseForbidden.authenticated(MANAGER, credentials) {
+        if (orderRepo.assignEmployeesToOrder(orderId, clientId, managerId, deliveryWorkerId)) responseOk
+        else responseBadRequest
+    }
+
+    @Transactional
     @PostMapping("/completeOrder")
     fun completeOrder(
         @RequestHeader orderId: Int,
