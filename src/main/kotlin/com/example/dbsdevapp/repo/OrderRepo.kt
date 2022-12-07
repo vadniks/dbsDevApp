@@ -34,6 +34,8 @@ class OrderRepo(
         orderMapper, clientId
     )
 
+    fun get(): List<Order> = template.query("select * from $ORDERS", orderMapper)
+
     fun get1(clientId: Int, created: Int) = null.tryCatch { template.queryForObject(
         "select * from $ORDERS where $CLIENT_ID = ? and $CREATED = ?", orderMapper, clientId, created) }
 

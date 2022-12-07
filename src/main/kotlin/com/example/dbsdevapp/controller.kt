@@ -266,8 +266,17 @@ class Controller(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestParam id: Int
     ) = responseForbidden.authenticated(MANAGER, credentials) {
-        for (boughtComponent in boughtComponentRepo.get(id))
+        val bought = boughtComponentRepo.get(id)
+        val orders = orderRepo.get()
+
+        for (boughtComponent in bought)
+            for (order in orders)
+                if (boughtComponent.orderId == order.orderId && boughtComponent.clientId == order.clientId)
+                    return@authenticated responseBadRequest
+
+        for (boughtComponent in bought)
             if (!boughtComponentRepo.delete(boughtComponent)) return@authenticated responseBadRequest
+
         if (componentRepo.delete(id)) responseOk else responseBadRequest
     }
 
