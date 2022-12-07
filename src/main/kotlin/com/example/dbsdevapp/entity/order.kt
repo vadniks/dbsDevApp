@@ -1,7 +1,5 @@
 package com.example.dbsdevapp.entity
 
-import com.example.dbsdevapp.Json
-import com.example.dbsdevapp.getTyped
 import org.springframework.jdbc.core.RowMapper
 
 data class Order(
@@ -13,7 +11,16 @@ data class Order(
     val count: Int,
     val created: Int,
     val completed: Int?
-) : IEntity { override val json get() = throw UnsupportedOperationException() }
+) : IEntity { override val json get() = HashMap<String, Any?>().apply {
+    put(ORDER_ID, orderId)
+    put(CLIENT_ID, clientId)
+    put(MANAGER_ID, managerId)
+    put(DELIVERY_WORKER_ID, deliveryWorkerId)
+    put(COST, cost)
+    put(COUNT, count)
+    put(CREATED, created)
+    put(COMPLETED, completed)
+} }
 
 const val ORDER_ID = "orderId"
 const val CLIENT_ID = "clientId"

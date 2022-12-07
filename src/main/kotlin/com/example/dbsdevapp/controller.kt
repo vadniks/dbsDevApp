@@ -159,6 +159,7 @@ class Controller(
     @GetMapping("/getComponent")
     fun getComponent(@RequestParam id: Int) = componentRepo.get(id)?.json
 
+    // curl 'localhost:8080/getClient?id=1' -H 'Auth-credentials: manager:pass'
     @ResponseBody
     @GetMapping("/getClient")
     fun getClient(
@@ -169,6 +170,7 @@ class Controller(
             ?: null.authenticated(MANAGER, credentials, this)
     }
 
+    // curl 'localhost:8080/getEmployee?id=1' -H 'Auth-credentials: manager:pass'
     @ResponseBody
     @GetMapping("/getEmployee")
     fun getEmployee(
@@ -176,24 +178,24 @@ class Controller(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
     ) = null.authenticated(MANAGER, credentials) { employeeInfoRepo.get(id) }
 
-    // curl 'localhost:8080/all/component' -H 'Auth-credentials: admin:admin'
+    // curl 'localhost:8080/getAllComponents'
     @ResponseBody
     @GetMapping("/getAllComponents")
     fun getAllComponents() = componentRepo.get().map { it.json }
 
+    // curl 'localhost:8080/getAllClients' -H 'Auth-credentials: manager:pass'
     @ResponseBody
     @GetMapping("/getAllClients")
     fun getAllClients(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
     = emptyList<Json>().authenticated(MANAGER, credentials) { clientRepo.get().map { it.json } }
 
+    // curl 'localhost:8080/getUserOrders?clientId=1' -H 'Auth-credentials: manager:pass'
     @ResponseBody
     @GetMapping("/getUserOrders")
     fun getUserOrders(
         @RequestParam clientId: Int,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
-    ) = emptyList<Json>().authenticated(MANAGER, credentials) {
-        orderRepo.get(clientId)
-    }
+    ) = emptyList<Json>().authenticated(MANAGER, credentials) { orderRepo.get(clientId).map { it.json } }
 
     @ResponseBody
     @GetMapping("/getOrderedComponents")
