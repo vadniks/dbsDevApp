@@ -307,10 +307,10 @@ class Controller(
 
         for (order in orderRepo.get(id, employeeInfo.jobType.job))
             if (!orderRepo.setEmployeeId(order.orderId!!, order.clientId, null, employeeInfo.jobType.job))
-                return@authenticated responseBadRequest
+                throw IllegalStateException()
 
         if (employeesRepo.delete(id, employeeInfo.jobType.table)
-            && employeeInfoRepo.delete(id)) responseOk else responseBadRequest
+            && employeeInfoRepo.delete(id)) responseOk else throw IllegalStateException()
     }
 
     // curl 'localhost:8080/deleteOrder?orderId=4&clientId=1' -X DELETE -H 'Auth-credentials: manager:pass'
@@ -322,7 +322,7 @@ class Controller(
         @RequestParam clientId: Int
     ) = responseForbidden.authenticated(MANAGER, credentials) {
         for (i in boughtComponentRepo.get(orderId, clientId))
-            if (!boughtComponentRepo.delete(i)) return@authenticated responseBadRequest
-        if (orderRepo.delete(orderId, clientId)) responseOk else responseBadRequest
+            if (!boughtComponentRepo.delete(i)) throw IllegalStateException()
+        if (orderRepo.delete(orderId, clientId)) responseOk else throw IllegalStateException()
     }
 }
