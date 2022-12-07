@@ -1,10 +1,14 @@
 package com.example.dbsdevapp.repo
 
 import com.example.dbsdevapp.entity.*
+import com.example.dbsdevapp.getTyped
 import com.example.dbsdevapp.log
 import com.example.dbsdevapp.tryCatch
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.jdbc.core.simple.SimpleJdbcCall
 import org.springframework.stereotype.Repository
+import org.springframework.util.LinkedCaseInsensitiveMap
+import kotlin.math.absoluteValue
 
 @Repository
 class OrderRepo(
@@ -44,13 +48,17 @@ class OrderRepo(
         orderMapper, employeeId
     )
 
-    fun update(order: Order) = template.update(
-        """update $ORDERS set $CLIENT_ID = ?, $MANAGER_ID = ?, $DELIVERY_WORKER_ID = ?, $COST = ?, $COUNT = ?, $CREATED = ?, $COMPLETED = ?
-           where $ORDER_ID = ?""".trimMargin(),
-        order.clientId, order.managerId, order.deliveryWorkerId,
-        order.cost, order.count, order.created,
-        order.completed
-    ) == 1
+    fun countAll() = (((SimpleJdbcCall(template)
+        .withProcedureName("countOrders")
+        .execute()
+        .values
+        .iterator()
+        .next() as List<*>)[0]!! as Map<*, *>)
+        .values
+        .iterator()
+        .next() as Long)
+        .toInt()
+        .absoluteValue
 
     fun assignEmployeesToOrder(
         orderId: Int,
