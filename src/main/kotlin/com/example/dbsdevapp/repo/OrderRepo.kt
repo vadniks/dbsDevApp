@@ -23,6 +23,9 @@ class OrderRepo(
 
     fun get(): List<Order> = template.query("select * from $ORDERS", orderMapper)
 
+    fun get1(clientId: Int, created: Int) = template.queryForObject(
+        "select * from $ORDERS where $CLIENT_ID = ? and $CREATED = ?", orderMapper, clientId, created)
+
     fun update(order: Order) = template.update(
         """update $ORDERS set $CLIENT_ID = ?, $MANAGER_ID = ?, $DELIVERY_WORKER_ID = ?, $COST = ?, $COUNT = ?, $CREATED = ?, $COMPLETED = ?
            where $ORDER_ID = ?""".trimMargin(),

@@ -7,7 +7,6 @@ import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 import kotlin.random.Random
-import kotlin.reflect.KClass
 
 private typealias VoidResponse = ResponseEntity<Void>
 private val responseOk = VoidResponse(HttpStatus.OK)
@@ -25,7 +24,8 @@ class Controller(
     private val clientRepo: ClientRepo,
     private val employeeInfoRepo: EmployeeInfoRepo,
     private val employeesRepo: EmployeesRepo,
-    private val orderRepo: OrderRepo
+    private val orderRepo: OrderRepo,
+    private val boughtComponentRepo: BoughtComponentRepo
 ) {
 
     @Suppress("NAME_SHADOWING")
@@ -104,8 +104,8 @@ class Controller(
         var count = 0
 
         for (i in componentIds) {
-            val component = componentRepo.get(i)
-            components.add(component ?: return responseBadRequest)
+            val component = componentRepo.get(i) ?: return responseBadRequest
+            components.add(component)
             cost += component.cost
             count++
         }
@@ -113,12 +113,20 @@ class Controller(
         val created = System.currentTimeMillis().toUInt().toInt()
         val random = Random(created)
 
-        return if (orderRepo.insert(Order(
+        if (!orderRepo.insert(Order(
             null, client.id!!,
             random.nextInt(employeesRepo.get(MANAGER).size),
             random.nextInt(employeesRepo.get(DELIVERY_WORKER).size),
             cost, count, created, null
-        ))) responseOk else responseBadRequest
+        ))) return responseBadRequest
+
+        val orderId = orderRepo.get1(clientId, created)?.orderId ?: return responseBadRequest
+
+        for (i in componentIds)
+            if (!boughtComponentRepo.insert(BoughtComponent(i, orderId, clientId)))
+                return responseBadRequest
+
+        return responseOk
     }
 
     @PostMapping("/completeOrder")
