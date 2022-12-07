@@ -1,14 +1,10 @@
 package com.example.dbsdevapp.repo
 
 import com.example.dbsdevapp.entity.*
-import com.example.dbsdevapp.getTyped
-import com.example.dbsdevapp.log
 import com.example.dbsdevapp.tryCatch
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.simple.SimpleJdbcCall
 import org.springframework.stereotype.Repository
-import org.springframework.util.LinkedCaseInsensitiveMap
-import kotlin.math.absoluteValue
 
 @Repository
 class OrderRepo(
@@ -18,7 +14,7 @@ class OrderRepo(
 
     fun insert(order: Order) = template.update(
         """insert into $ORDERS($CLIENT_ID, $MANAGER_ID, $DELIVERY_WORKER_ID, $COST, $COUNT, $CREATED, $COMPLETED)
-           values(?, ?, ?, ?, ?, ?, ?)""".trimMargin().apply { log.info(order.toString()) },
+           values(?, ?, ?, ?, ?, ?, ?)""".trimMargin(),
         order.clientId, order.managerId, order.deliveryWorkerId,
         order.cost, order.count, order.created,
         order.completed
