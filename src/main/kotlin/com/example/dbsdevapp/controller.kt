@@ -286,6 +286,7 @@ class Controller(
             && employeeInfoRepo.delete(id)) responseOk else responseBadRequest
     }
 
+    // curl 'localhost:8080/deleteOrder?orderId=4&clientId=1' -X DELETE -H 'Auth-credentials: manager:pass'
     @Transactional
     @DeleteMapping("/deleteOrder")
     fun deleteOrder(
@@ -294,7 +295,7 @@ class Controller(
         @RequestParam clientId: Int
     ) = responseForbidden.authenticated(MANAGER, credentials) {
         for (i in boughtComponentRepo.get(orderId, clientId))
-            boughtComponentRepo.delete(i)
-        orderRepo.delete(orderId, clientId)
+            if (!boughtComponentRepo.delete(i)) return@authenticated responseBadRequest
+        if (orderRepo.delete(orderId, clientId)) responseOk else responseBadRequest
     }
 }
