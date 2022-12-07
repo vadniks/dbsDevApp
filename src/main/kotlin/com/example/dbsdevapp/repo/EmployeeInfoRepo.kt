@@ -25,6 +25,12 @@ class EmployeeInfoRepo(
     fun get(email: String) = null.tryCatch { template.queryForObject(
         "select $EMPLOYEE_ID from $EMPLOYEE_INFO where $EMAIL = ?", Int::class.java, email) }
 
+    fun get1(email: String) = null.tryCatch { template.queryForObject(
+        "select getEmployeeIdByEmail(?)",
+        Int::class.java,
+        email
+    ) }
+
     fun get(name: String, password: String, jobType: JobType) = null.tryCatch { template.queryForObject(
         "select * from $EMPLOYEE_INFO where $NAME = ? and $PASSWORD = ? and $JOB_TYPE = ?",
         employeeInfoMapper,

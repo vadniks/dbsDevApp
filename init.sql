@@ -177,6 +177,7 @@ create function getEmployeeIdByEmail($email varchar(32)) returns int(6) reads sq
     return @id;
 end$$
 delimiter ;
+select getEmployeeIdByEmail('manager@email.com');
 
 delimiter $$
 create procedure addManager(

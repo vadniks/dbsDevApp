@@ -218,6 +218,13 @@ class Controller(
             ?: emptyList()
     }
 
+    // curl 'localhost:8080/getEmployeeByEmail?email=manager@email.com' -H 'Auth-credentials: manager:pass'
+    @GetMapping("/getEmployeeByEmail")
+    fun getEmployeeByEmail(
+        @RequestParam email: String,
+        @RequestHeader(AUTH_CREDENTIALS) credentials: String
+    ) = null.authenticated(MANAGER, credentials) { employeeInfoRepo.get1(email) }
+
     // curl 'localhost:8080/countOrders' -H 'Auth-credentials: manager:pass'
     @GetMapping("/countOrders")
     fun countOrders(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
