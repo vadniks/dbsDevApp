@@ -269,6 +269,7 @@ class Controller(
         if (result) responseOk else responseBadRequest
     }
 
+    // curl 'localhost:8080/deleteEmployee?id=1' -X DELETE -H 'Auth-credentials: manager:pass'
     @Transactional
     @DeleteMapping("/deleteEmployee")
     fun deleteEmployee(
@@ -277,11 +278,12 @@ class Controller(
     ) = responseForbidden.authenticated(MANAGER, credentials) {
         val employeeInfo = employeeInfoRepo.get(id) ?: return@authenticated responseBadRequest
 
-        for (order in orderRepo.get(id, employeeInfo.jobType.table))
-            orderRepo.setEmployeeId(order.orderId!!, order.clientId, null, employeeInfo.jobType.job)
+        for (order in orderRepo.get(id, employeeInfo.jobType.job))
+            if (!orderRepo.setEmployeeId(order.orderId!!, order.clientId, null, employeeInfo.jobType.job))
+                return@authenticated responseBadRequest
 
-        employeesRepo.delete(id, employeeInfo.jobType.table)
-        employeeInfoRepo.delete(id)
+        if (employeesRepo.delete(id, employeeInfo.jobType.table)
+            && employeeInfoRepo.delete(id)) responseOk else responseBadRequest
     }
 
     @Transactional

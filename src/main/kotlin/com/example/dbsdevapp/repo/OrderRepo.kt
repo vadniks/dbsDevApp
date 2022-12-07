@@ -76,7 +76,7 @@ class OrderRepo(
             }
         } = ? where $ORDER_ID = ? and $CLIENT_ID = ?",
         employeeId, orderId, clientId
-    )
+    ) == 1
 
     fun delete(orderId: Int, clientId: Int) = template.update(
         "delete from $ORDERS where $ORDER_ID = ? and $CLIENT_ID = ?",
