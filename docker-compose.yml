@@ -1,12 +1,4 @@
 services:
-#  web:
-#    build: .
-#    ports:
-#      - "8080:8080"
-#    depends_on:
-#      db:
-#        condition: service_healthy
-#    container_name: dbs_dev_web
   db:
     image: mysql
     container_name: dbs_dev_app_mysql
