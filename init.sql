@@ -69,6 +69,7 @@ values(1, null, null, 100, 3, 123);
 # curl 'localhost:8080/getEmployeeIdByEmail?email=manager@a.a' -H 'Auth-credentials: manager:pass'
 # curl 'localhost:8080/countOrders' -H 'Auth-credentials: manager:pass'
 # curl 'localhost:8080/sumOrders' -H 'Auth-credentials: manager:pass'
+# curl 'localhost:8080/databaseInformation' -H 'Auth-credentials: manager:pass'
 # curl 'localhost:8080/updateComponent' -X PUT -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"componentId":1,"name":"a@","type":0,"description":"aa_","cost":10,"image":null,"count":9}'
 # curl 'localhost:8080/updateClient' -X PUT -H 'Auth-credentials: client1:pass' -H 'Content-Type: application/json' -d '{"clientId":1,"name":"client1","surname":"$","phone":1000000000,"address":"@","email":"client1@email.com","password":"pass"}'
 # curl 'localhost:8080/updateEmployee' -X PUT -H 'Auth-credentials: manager:pass' -H 'Content-Type: application/json' -d '{"employeeId":2,"name":"manager2","surname":"manager2_","phone":1000000010,"email":"manager2@email.com","password":"pass","salary":100,"jobType":0}'
@@ -228,6 +229,20 @@ create function sumOrders() returns int(6) reads sql data begin
 end$$
 delimiter ;
 select sumOrders();
+
+drop procedure databaseInformation;
+delimiter $$
+create procedure databaseInformation(
+    out _version varchar(255), out currentDate varchar(255), out currentTime varchar(255), out currentUser varchar(255)
+) begin
+    select version() into _version;
+    select current_date into currentDate;
+    select current_time into currentTime;
+    select current_user into currentUser;
+end$$
+delimiter ;
+call databaseInformation(@_version, @currentDate, @currentTime, @currentUser);
+select @_version, @currentDate, @currentTime, @currentUser;
 
 delimiter $$
 create procedure addManager(

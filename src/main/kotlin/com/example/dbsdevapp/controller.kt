@@ -23,7 +23,8 @@ class Controller(
     private val employeeInfoRepo: EmployeeInfoRepo,
     private val employeesRepo: EmployeesRepo,
     private val orderRepo: OrderRepo,
-    private val boughtComponentRepo: BoughtComponentRepo
+    private val boughtComponentRepo: BoughtComponentRepo,
+    private val otherRepo: OtherRepo
 ) {
 
     @Suppress("NAME_SHADOWING")
@@ -234,6 +235,11 @@ class Controller(
     @GetMapping("/sumOrders")
     fun sumOrders(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
     = null.authenticated(MANAGER, credentials) { orderRepo.sumAll() }
+
+    // curl 'localhost:8080/databaseInformation' -H 'Auth-credentials: manager:pass'
+    @GetMapping("/databaseInformation")
+    fun databaseInformation(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
+    = null.authenticated(MANAGER, credentials) { otherRepo.databaseInformation() }
 
     // curl 'localhost:8080/updateComponent' -X PUT -H 'Auth-credentials: admin:admin' -H 'Content-Type: application/json' -d '{"componentId":3,"name":"aa@","type":1,"description":"bb_","cost":10,"image":null,"count":1}'
     @PutMapping("/updateComponent")
