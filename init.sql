@@ -23,20 +23,20 @@ delete from components where components.componentId > 0;
 update orders set managerId = 1 where orderId = 4;
 
 insert into clients(clientId, name, surname, phone, address, email, password) values(
-                                                                                        1, 'client1', '_', 1000000000, '_', 'client1@email.com', 'pass');
+    1, 'client1', '_', 1000000000, '_', 'client1@email.com', 'pass');
 insert into clients(clientId, name, surname, phone, address, email, password) values(
-                                                                                        2, 'client2', '_', 1000000001, '_', 'client2@email.com', 'pass');
+    2, 'client2', '_', 1000000001, '_', 'client2@email.com', 'pass');
 
 insert into employeeInfo(name, surname, phone, email, password, salary, jobType) values(
-                                                                                           'manager', '_', 0000000000, 'manager@a.a', 'pass', 0, 0);
+    'manager', '_', 0000000000, 'manager@a.a', 'pass', 0, 0);
 insert into managers(employeeId) values(1);
 
 insert into components(componentid, name, type, description, cost, count) values(
-                                                                                    1, 'a', 0, 'aa', 1000, 10);
+    1, 'a', 0, 'aa', 1000, 10);
 insert into components(componentid, name, type, description, cost, count) values(
-                                                                                    2, 'b', 1, 'bb', 1000, 10);
+    2, 'b', 1, 'bb', 1000, 10);
 insert into components(componentid, name, type, description, cost, count) values(
-                                                                                    3, 'c', 2, 'cc', 1000, 10);
+    3, 'c', 2, 'cc', 1000, 10);
 
 insert into boughtComponents(componentId, orderId, clientId) values(1, 4, 1);
 insert into boughtComponents(componentId, orderId, clientId) values(2, 4, 1);
@@ -81,74 +81,74 @@ values(1, null, null, 100, 3, 123);
 -- -------------------------------------------------------------------------------------------
 
 create table components(
-                           componentId integer unsigned not null auto_increment unique,
-                           name varchar(255) not null unique,
-                           type integer unsigned not null,
-                           description varchar(255) not null,
-                           cost integer unsigned not null,
-                           image varchar(255) null,
-                           count integer unsigned not null,
-                           primary key (componentId)
+    componentId integer unsigned not null auto_increment unique,
+    name varchar(255) not null unique,
+    type integer unsigned not null,
+    description varchar(255) not null,
+    cost integer unsigned not null,
+    image varchar(255) null,
+    count integer unsigned not null,
+    primary key (componentId)
 );
 
 create table clients(
-                        clientId integer unsigned not null auto_increment unique,
-                        name varchar(255) not null,
-                        surname varchar(255) not null,
-                        phone integer unsigned not null unique, /* +1 234 567 89 00 */
-                        address varchar(255) not null,
-                        email varchar(255) not null unique,
-                        password varchar(255) not null,
-                        primary key (clientId)
+    clientId integer unsigned not null auto_increment unique,
+    name varchar(255) not null,
+    surname varchar(255) not null,
+    phone integer unsigned not null unique, /* +1 234 567 89 00 */
+    address varchar(255) not null,
+    email varchar(255) not null unique,
+    password varchar(255) not null,
+    primary key (clientId)
 );
 
 create table employeeInfo(
-                             employeeId integer unsigned not null auto_increment unique,
-                             name varchar(255) not null,
-                             surname varchar(255) not null,
-                             phone integer unsigned not null unique,
-                             email varchar(255) not null unique,
-                             password varchar(255) not null,
-                             salary integer unsigned not null,
-                             jobType integer unsigned not null,
-                             primary key (employeeId)
+    employeeId integer unsigned not null auto_increment unique,
+    name varchar(255) not null,
+    surname varchar(255) not null,
+    phone integer unsigned not null unique,
+    email varchar(255) not null unique,
+    password varchar(255) not null,
+    salary integer unsigned not null,
+    jobType integer unsigned not null,
+    primary key (employeeId)
 );
 
 create table managers(
-                         employeeId integer unsigned not null auto_increment unique,
-                         foreign key (employeeId) references employeeInfo(employeeId) on update cascade on delete cascade,
-                         primary key (employeeId)
+    employeeId integer unsigned not null auto_increment unique,
+    foreign key (employeeId) references employeeInfo(employeeId) on update cascade on delete cascade,
+    primary key (employeeId)
 );
 
 create table deliveryWorkers(
-                                employeeId integer unsigned not null auto_increment unique,
-                                foreign key (employeeId) references employeeInfo(employeeId) on update cascade on delete cascade,
-                                primary key (employeeId)
+    employeeId integer unsigned not null auto_increment unique,
+    foreign key (employeeId) references employeeInfo(employeeId) on update cascade on delete cascade,
+    primary key (employeeId)
 );
 
 create table orders(
-                       orderId integer unsigned not null auto_increment,
-                       clientId integer unsigned not null,
-                       managerId integer unsigned null,
-                       deliveryWorkerId integer unsigned null,
-                       cost integer unsigned not null,
-                       count integer unsigned not null,
-                       creationDatetime integer unsigned not null,
-                       completionDatetime integer unsigned null,
-                       foreign key (clientId) references clients(clientId) on update cascade on delete cascade,
-                       foreign key (managerId) references managers(employeeId) on update cascade on delete set null,
-                       foreign key (deliveryWorkerId) references deliveryWorkers(employeeId) on update cascade on delete set null,
-                       primary key (orderId, clientId)
+    orderId integer unsigned not null auto_increment,
+    clientId integer unsigned not null,
+    managerId integer unsigned null,
+    deliveryWorkerId integer unsigned null,
+    cost integer unsigned not null,
+    count integer unsigned not null,
+    creationDatetime integer unsigned not null,
+    completionDatetime integer unsigned null,
+    foreign key (clientId) references clients(clientId) on update cascade on delete cascade,
+    foreign key (managerId) references managers(employeeId) on update cascade on delete set null,
+    foreign key (deliveryWorkerId) references deliveryWorkers(employeeId) on update cascade on delete set null,
+    primary key (orderId, clientId)
 );
 
 create table boughtComponents(
-                                 componentId integer unsigned not null,
-                                 orderId integer unsigned not null,
-                                 clientId integer unsigned not null,
-                                 foreign key (componentId) references components(componentId) on update cascade on delete cascade,
-                                 foreign key (orderId) references orders(orderId) on update cascade on delete cascade,
-                                 foreign key (clientId) references clients(clientId) on update cascade on delete cascade,
-                                 primary key (componentId, orderId, clientId)
+    componentId integer unsigned not null,
+    orderId integer unsigned not null,
+    clientId integer unsigned not null,
+    foreign key (componentId) references components(componentId) on update cascade on delete cascade,
+    foreign key (orderId) references orders(orderId) on update cascade on delete cascade,
+    foreign key (clientId) references clients(clientId) on update cascade on delete cascade,
+    primary key (componentId, orderId, clientId)
 );
 
 create unique index componentIdX on components(componentId);
@@ -204,7 +204,7 @@ create procedure _select(which int(1)) begin case which
     when 4 then select * from managers;
     when 5 then select * from deliveryWorkers;
     when 6 then select * from boughtComponents;
-    end case; end$$
+end case; end$$
 delimiter ;
 
 drop procedure countOrders;
@@ -312,42 +312,42 @@ describe boughtComponents;
 -- insertions and DML from part 3 --------------------------------------------
 
 insert into components(name, type, description, cost, count) values(
-                                                                       'Intel Core i7-10700K', 0, 'Desktop Processor 8 Cores up to 5.1 GHz Unlocked LGA1200', 2000, 10);
+    'Intel Core i7-10700K', 0, 'Desktop Processor 8 Cores up to 5.1 GHz Unlocked LGA1200', 2000, 10);
 insert into components(name, type, description, cost, count) values(
-                                                                       'Intel Core i9-12900K', 0, 'Desktop Processor 16 (8P+8E) Cores up to 5.2 GHz Unlocked LGA1700', 3000, 5);
+    'Intel Core i9-12900K', 0, 'Desktop Processor 16 (8P+8E) Cores up to 5.2 GHz Unlocked LGA1700', 3000, 5);
 insert into components(name, type, description, cost, count) values(
-                                                                       'Intel Core i9-11900K', 0, 'Desktop Processor 8 Cores up to 5.3 GHz Unlocked LGA1200', 2500, 8);
+    'Intel Core i9-11900K', 0, 'Desktop Processor 8 Cores up to 5.3 GHz Unlocked LGA1200', 2500, 8);
 insert into components(name, type, description, cost, count) values(
-                                                                       'AMD Ryzen™ 9 7950X', 0, '16-Core, 32-Thread Unlocked Desktop Processor', 3000, 10);
+    'AMD Ryzen™ 9 7950X', 0, '16-Core, 32-Thread Unlocked Desktop Processor', 3000, 10);
 insert into components(name, type, description, cost, count) values(
-                                                                       'AMD Ryzen 5 5600X 6-core', 0, '12-Thread Unlocked Desktop Processor with Wraith Stealth Cooler', 1500, 10);
+    'AMD Ryzen 5 5600X 6-core', 0, '12-Thread Unlocked Desktop Processor with Wraith Stealth Cooler', 1500, 10);
 insert into components(name, type, description, cost, count) values(
-                                                                       'AMD Ryzen 7 5800X 8-core', 0, '16-Thread Unlocked Desktop Processor', 2500, 10);
+    'AMD Ryzen 7 5800X 8-core', 0, '16-Thread Unlocked Desktop Processor', 2500, 10);
 insert into components(name, type, description, cost, count) values(
-                                                                       'NVIDIA Quadro P2200', 2, 'Video Graphic Cards (VCQP2200-SB)', 1000, 10);
+    'NVIDIA Quadro P2200', 2, 'Video Graphic Cards (VCQP2200-SB)', 1000, 10);
 insert into components(name, type, description, cost, count) values(
-                                                                       'NVIDIA GeForce RTX 3060 Ti', 2, 'Founders Edition 8GB GDDR6 PCI Express 4.0 Graphics Card', 5000, 10);
+    'NVIDIA GeForce RTX 3060 Ti', 2, 'Founders Edition 8GB GDDR6 PCI Express 4.0 Graphics Card', 5000, 10);
 insert into components(name, type, description, cost, count) values(
-                                                                       'AMD Radeon PRO W5500 8GB', 2, '', 1500, 10);
+    'AMD Radeon PRO W5500 8GB', 2, '', 1500, 10);
 insert into components(name, type, description, cost, count) values(
-                                                                       'AMD Radeon RX 6800 XT', 2, 'Reference Edition Gaming Graphics Card', 1500, 10);
+    'AMD Radeon RX 6800 XT', 2, 'Reference Edition Gaming Graphics Card', 1500, 10);
 
 insert into clients(name, surname, phone, address, email, password) values(
-                                                                              'John', 'Johnson', 1234567890, 'Georg Street 22', 'john_j@email.com',
-                                                                              '$2a$12$iV0DP3E5Q6Ppxj.wVyXiG.LQyd/39vD2vcnDIyaHhOOYIiP.TXkm2');
+    'John', 'Johnson', 1234567890, 'Georg Street 22', 'john_j@email.com',
+    '$2a$12$iV0DP3E5Q6Ppxj.wVyXiG.LQyd/39vD2vcnDIyaHhOOYIiP.TXkm2');
 insert into clients(name, surname, phone, address, email, password) values(
-                                                                              'Tom', 'Thomson', 1200517891, 'Stevenson Street 40', 'tom_t10@email.com',
-                                                                              '$2a$12$.wvgogPK7YxKCvXOhdEfMe69vmIIbXrtbnPE08Ic24vXBR2YRwwtu');
+    'Tom', 'Thomson', 1200517891, 'Stevenson Street 40', 'tom_t10@email.com',
+    '$2a$12$.wvgogPK7YxKCvXOhdEfMe69vmIIbXrtbnPE08Ic24vXBR2YRwwtu');
 insert into clients(name, surname, phone, address, email, password) values(
-                                                                              'Michel', 'Meclins', 1235607891, 'Clarkson Street 80', 'mclmcs@email.com',
-                                                                              '$2a$12$1B6k3quEpOzUijv/XAxscODeXPEsfE645ObO0Aj8EgCCPPF0RJqMi');
+    'Michel', 'Meclins', 1235607891, 'Clarkson Street 80', 'mclmcs@email.com',
+    '$2a$12$1B6k3quEpOzUijv/XAxscODeXPEsfE645ObO0Aj8EgCCPPF0RJqMi');
 
 insert into employeeInfo(name, surname, phone, email, salary, jobType) values(
-                                                                                 'Annabel', 'Wes', 1634007880, 'ablwes@email.com', 300, 0);
+    'Annabel', 'Wes', 1634007880, 'ablwes@email.com', 300, 0);
 insert into employeeInfo(name, surname, phone, email, salary, jobType) values(
-                                                                                 'James', 'Lims', 1045001651, 'vgs165@email.com', 200, 1);
+    'James', 'Lims', 1045001651, 'vgs165@email.com', 200, 1);
 insert into employeeInfo(name, surname, phone, email, salary, jobType) values(
-                                                                                 'Agatha', 'Milkins', 1200067800, 'milkins25a@email.com', 250, 1);
+    'Agatha', 'Milkins', 1200067800, 'milkins25a@email.com', 250, 1);
 
 insert into managers(employeeId) values(1);
 
@@ -434,36 +434,36 @@ select sum(count) from orders where clientId = 1; # sum of components count sele
 
 select orders.clientId, name, surname, count, cost from orders, clients where orders.clientId = clients.clientId; # (3) combination of 2 tables
 select deliveryWorkers.employeeId, name, surname from deliveryWorkers, employeeInfo
-where deliveryWorkers.employeeId = employeeInfo.employeeId; # selection
+    where deliveryWorkers.employeeId = employeeInfo.employeeId; # selection
 
 select orderId, name, surname from orders, clients
-where orders.clientId = clients.clientId and (deliveryWorkerId = 2 or deliveryWorkerId = 3); # (4) union
+    where orders.clientId = clients.clientId and (deliveryWorkerId = 2 or deliveryWorkerId = 3); # (4) union
 
 select name, surname, cost from clients, orders where managerId = 1 and cost > 120; # (5) intersection
 
 select componentId, name from components where not exists
     (select componentId from boughtComponents where components.componentId = boughtComponents.componentId)
-order by componentId; # (6) difference
+    order by componentId; # (6) difference
 
 select components.componentId, components.name, boughtComponents.componentId from boughtComponents
-                                                                                      inner join components on components.componentId = boughtComponents.componentId
-order by components.componentId desc; # (8) sort and join
+    inner join components on components.componentId = boughtComponents.componentId
+    order by components.componentId desc; # (8) sort and join
 
 # select orders.orderId, orders.clientId, boughtComponents.componentId from orders
 #     left join boughtComponents on orders.clientId = boughtComponents.clientId and orders.orderId = boughtComponents.orderId order by orders.orderId;
 
 select components.componentId, components.name, boughtComponents.componentId from components
-                                                                                      left join boughtComponents on components.componentId = boughtComponents.componentId
-order by components.componentId;
+    left join boughtComponents on components.componentId = boughtComponents.componentId
+    order by components.componentId;
 
 select components.componentId, components.name, boughtComponents.componentId from components
-                                                                                      right join boughtComponents on components.componentId = boughtComponents.componentId
-order by components.componentId;
+    right join boughtComponents on components.componentId = boughtComponents.componentId
+    order by components.componentId;
 
 select components.componentId, components.name from components
-                                                        left join boughtComponents on components.componentId = boughtComponents.componentId union
-select components.componentId, components.name from components
-                                                        right join boughtComponents on components.componentId = boughtComponents.componentId; # full pouter join
+    left join boughtComponents on components.componentId = boughtComponents.componentId union
+    select components.componentId, components.name from components
+    right join boughtComponents on components.componentId = boughtComponents.componentId; # full pouter join
 
 -- stored procedures calls ---------------------------------------------------
 
