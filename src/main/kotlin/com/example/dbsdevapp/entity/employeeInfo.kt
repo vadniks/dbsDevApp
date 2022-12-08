@@ -13,7 +13,7 @@ data class EmployeeInfo(
     val password: String,
     val salary: Int,
     val jobType: JobType
-) : IEntity { override val json get() = HashMap<String, Any?>().apply {
+) : IEntity { override val json get() = JsonImpl().apply {
     put(EMPLOYEE_ID, id)
     put(NAME, name)
     put(SURNAME, surname)

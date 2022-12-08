@@ -5,6 +5,7 @@ import com.example.dbsdevapp.tryCatch
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 
+@Suppress("DeprecatedCallableAddReplaceWith")
 @Repository
 class ComponentRepo(
     @Suppress("SpringJavaInjectionPointsAutowiringInspection")

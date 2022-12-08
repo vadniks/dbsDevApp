@@ -26,5 +26,4 @@ val employeeMappers = arrayOf(
     DELIVERY_WORKER to RowMapper { rs, _ -> employeeMapper(DeliveryWorker::class, rs) }
 )
 
-fun Array<Pair<String, RowMapper<out IEmployee>>>.employee(which: String)
-= find { it.first == which }!!.second
+fun Array<Pair<String, RowMapper<out IEmployee>>>.employee(which: String) = find { it.first == which }!!.second

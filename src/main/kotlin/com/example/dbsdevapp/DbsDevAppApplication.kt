@@ -8,11 +8,13 @@ import java.util.logging.Logger
 @SpringBootApplication
 class DbsDevAppApplication
 
+@Suppress("unused")
 val Any?.unit get() = Unit
 
 fun <T> T?.tryCatch(throwable: () -> T) = try { throwable() } catch (_: Exception) { this }
 
-val log = Logger.getLogger("a")
+@Suppress("unused")
+val log = Logger.getLogger("a")!!
 
 fun main(vararg args: String) = SpringApplication(DbsDevAppApplication::class.java).apply {
     setDefaultProperties(Properties().apply {

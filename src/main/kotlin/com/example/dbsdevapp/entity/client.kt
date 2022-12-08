@@ -12,7 +12,7 @@ data class Client(
     val address: String,
     val email: String,
     val password: String
-) : IEntity { override val json get() = HashMap<String, Any?>().apply {
+) : IEntity { override val json get() = JsonImpl().apply {
     put(CLIENT_ID, id)
     put(NAME, name)
     put(SURNAME, surname)

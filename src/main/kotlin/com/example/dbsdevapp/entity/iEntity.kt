@@ -9,7 +9,9 @@ interface IEntity {
 
 typealias JsonImpl = HashMap<String, Any?>
 
+@Suppress("USELESS_CAST")
 fun ResultSet.getNullableInt(columnLabel: String) = getObject(columnLabel, Int::class.java) as Int?
+@Suppress("USELESS_CAST")
 fun ResultSet.getNullableString(columnLabel: String) = getString(columnLabel) as String?
 
 val List<out IEntity>.json get() = map { it.json }

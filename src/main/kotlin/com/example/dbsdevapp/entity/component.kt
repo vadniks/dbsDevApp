@@ -39,7 +39,6 @@ const val COST = "cost"
 const val IMAGE = "image"
 const val COUNT = "count"
 const val COMPONENTS = "components"
-const val COMPONENT = "component"
 
 enum class ComponentType(val type: Int, val title: String) {
     CPU (0, "Processor"),

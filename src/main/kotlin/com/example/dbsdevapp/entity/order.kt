@@ -11,7 +11,7 @@ data class Order(
     val count: Int,
     val created: Int,
     val completed: Int?
-) : IEntity { override val json get() = HashMap<String, Any?>().apply {
+) : IEntity { override val json get() = JsonImpl().apply {
     put(ORDER_ID, orderId)
     put(CLIENT_ID, clientId)
     put(MANAGER_ID, managerId)
@@ -29,7 +29,6 @@ const val DELIVERY_WORKER_ID = "deliveryWorkerId"
 const val CREATED = "creationDatetime"
 const val COMPLETED = "completionDatetime"
 const val ORDERS = "orders"
-const val ORDER = "order"
 
 val orderMapper = RowMapper<Order> { resultSet, _ -> Order(
     resultSet.getNullableInt(ORDER_ID),

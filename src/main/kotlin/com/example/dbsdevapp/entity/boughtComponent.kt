@@ -8,7 +8,6 @@ data class BoughtComponent(
     val clientId: Int
 ) : IEntity { override val json get() = throw UnsupportedOperationException() }
 
-const val BOUGHT_COMPONENT = "boughtComponent"
 const val BOUGHT_COMPONENTS = "boughtComponents"
 
 val boughtComponentMapper = RowMapper<BoughtComponent> { resultSet, _ -> BoughtComponent(
