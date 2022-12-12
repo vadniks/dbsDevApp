@@ -189,9 +189,9 @@ class Controller(
     fun getAllClients(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
     = emptyList<Json>().authenticated(MANAGER, credentials) { clientRepo.get().json }
 
-    // curl 'localhost:8080/getUserOrders?clientId=1' -H 'Auth-credentials: client1:pass'
+    // curl 'localhost:8080/getClientOrders?clientId=1' -H 'Auth-credentials: client1:pass'
     @ResponseBody
-    @GetMapping("/getUserOrders")
+    @GetMapping("/getClientOrders")
     fun getUserOrders(
         @RequestParam clientId: Int,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
