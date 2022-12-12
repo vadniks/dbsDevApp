@@ -23,6 +23,7 @@
         </style>
     </head>
     <body>
+        <h1 id="welcome" style="display: none"></h1><br>
         <button onclick="redir('/orders')">Go to orders page</button>
         <h1>Components catalogue</h1>
         <div class="list">
@@ -41,9 +42,12 @@
                 const credentials = getCredentials()
                 if (credentials == null) return
                 checkCredentials(credentials, fullName => {
-                    const username = document.createElement('span')
-                    username.innerText = fullName
-                    document.querySelector('body').appendChild(username)
+                    const user = document.createElement('span')
+                    user.innerText = fullName
+
+                    const welcome = document.querySelector('#welcome')
+                    welcome.style.display = 'initial'
+                    welcome.textContent = `Welcome ${fullName}!`
                 }, null)
             }
 
