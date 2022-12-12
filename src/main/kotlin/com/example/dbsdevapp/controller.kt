@@ -170,6 +170,10 @@ class Controller(
             ?: null.authenticated(MANAGER, credentials, this)
     }
 
+    @GetMapping("/getClient1")
+    fun getClient(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
+    = credentials.split(':').run { clientRepo.get(this[0], this[1]) }
+
     // curl 'localhost:8080/getEmployee?id=1' -H 'Auth-credentials: manager:pass'
     @ResponseBody
     @GetMapping("/getEmployee")
@@ -177,6 +181,11 @@ class Controller(
         @RequestParam id: Int,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
     ) = null.authenticated(MANAGER, credentials) { employeeInfoRepo.get(id)?.json }
+
+    @ResponseBody
+    @GetMapping("/getEmployeeFullName")
+    fun getEmployeeFullName(@RequestParam id: Int)
+    = employeeInfoRepo.get(id)?.run { """{"name":"$name","surname":"$surname"}""" }
 
     // curl 'localhost:8080/getAllComponents'
     @ResponseBody

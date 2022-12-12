@@ -36,12 +36,73 @@
         </div>
         <script>
             const credentials = getCredentials()
+            if (credentials == null) {
+                redir('/login')
+                exit(0)
+            }
+
             checkCredentials(credentials, username => {
                 const h1 = document.querySelector('h1')
                 h1.textContent = h1.textContent + username
 
-                fetch()
-                // fetch('/getClientOrders?clientId=' + )
+                fetch('/getClient1', {method: 'GET', headers: {'Auth-credentials': credentials}})
+                    .then(response => response.json())
+                    .then(client =>
+                        fetch('/getClientOrders?clientId=' + client.clientId)
+                            .then(response => response.json())
+                            .then(json => {
+                                const list = document.querySelector('.div')
+                                for (const order of json) {
+                                    const item = document.createElement('div')
+                                    item.className = 'item'
+
+                                    const id = document.createElement('span')
+                                    id.style.width = '10%'
+                                    id.textContent = order.orderId
+                                    item.appendChild(id)
+
+                                    const manager = document.createElement('span')
+                                    manager.style.width = '15%'
+                                    fetch(
+                                        '/getEmployeeFullName?id=' + order.managerId,
+                                        {method: 'GET'}
+                                    ).then(response => response.json())
+                                        .then(json => manager.textContent = json.name + ' ' + json.surname)
+                                    item.appendChild(manager)
+
+                                    const delivery = document.createElement('span')
+                                    delivery.style.width = '15%'
+                                    fetch(
+                                        '/getEmployeeFullName?id=' + order.deliveryWorkerId,
+                                        {method: 'GET'}
+                                    ).then(response => response.json())
+                                        .then(json => delivery.textContent = json.name + ' ' + json.surname)
+                                    item.appendChild(delivery)
+
+                                    const cost = document.createElement('span')
+                                    cost.style.width = '10%'
+                                    cost.textContent = order.cost
+                                    item.appendChild(cost)
+
+                                    const count = document.createElement('span')
+                                    count.style.width = '10%'
+                                    count.textContent = order.count
+                                    item.appendChild(count)
+
+                                    const created = document.createElement('span')
+                                    created.style.width = '10%'
+                                    created.textContent = order.created
+                                    item.appendChild(created)
+
+                                    const completed = document.createElement('span')
+                                    completed.style.width = '10%'
+                                    completed.textContent = order.completed
+                                    item.appendChild(completed)
+
+                                    list.appendChild(item)
+                                }
+                            })
+                    )
             })
         </script>
     </body>
