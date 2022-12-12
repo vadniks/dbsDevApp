@@ -118,7 +118,7 @@ class Controller(
         val orderId = orderRepo.get1(clientId, created)?.orderId ?: throw IllegalStateException()
 
         for (i in componentIds) if (
-            !boughtComponentRepo.insert(BoughtComponent(i, orderId, clientId))
+            !boughtComponentRepo.insert(BoughtComponent(i, orderId))
             || !componentRepo.decreaseCount(i)
         ) throw IllegalStateException()
 
@@ -210,7 +210,7 @@ class Controller(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
     ) = {
         val components = ArrayList<Component>()
-        for (boughtComponent in boughtComponentRepo.get(orderId, clientId))
+        for (boughtComponent in boughtComponentRepo.get(orderId))
             components.add(componentRepo.get(boughtComponent.componentId)!!)
         components.json
     }.run {
@@ -233,9 +233,9 @@ class Controller(
     @ResponseBody
     @GetMapping("/checkCredentials")
     fun checkCredentials(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
-    = null.authenticated(CLIENT, credentials) { credentials.parseCredentials { clientRepo.get(it[0], it[1]) } }
-    ?: null.authenticated(MANAGER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER) } }
-    ?: null.authenticated(DELIVERY_WORKER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER) } }
+    = null.authenticated(CLIENT, credentials) { credentials.parseCredentials { clientRepo.get(it[0], it[1])?.name } }
+    ?: null.authenticated(MANAGER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER)?.name } }
+    ?: null.authenticated(DELIVERY_WORKER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER)?.name } }
     ?: false
 
     // curl 'localhost:8080/countOrders' -H 'Auth-credentials: manager:pass'
@@ -284,12 +284,12 @@ class Controller(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String,
         @RequestParam id: Int
     ) = responseForbidden.authenticated(MANAGER, credentials) {
-        val bought = boughtComponentRepo.get(id)
+        val bought = boughtComponentRepo.get1(id)
         val orders = orderRepo.get()
 
         for (boughtComponent in bought)
             for (order in orders)
-                if (boughtComponent.orderId == order.orderId && boughtComponent.clientId == order.clientId)
+                if (boughtComponent.orderId == order.orderId)
                     return@authenticated responseBadRequest
 
         for (boughtComponent in bought)
@@ -305,7 +305,7 @@ class Controller(
         @RequestParam id: Int
     ) = responseForbidden.authenticated(MANAGER, credentials) {
         for (order in orderRepo.get(id)) {
-            for (boughtComponent in boughtComponentRepo.get(order.orderId!!, order.clientId)) {
+            for (boughtComponent in boughtComponentRepo.get(order.orderId!!)) {
                 if (!boughtComponentRepo.delete(boughtComponent)) throw IllegalStateException()
                 if (!componentRepo.increaseCount(boughtComponent.componentId)) throw IllegalStateException()
             }
@@ -339,7 +339,7 @@ class Controller(
         @RequestParam orderId: Int,
         @RequestParam clientId: Int
     ) = responseForbidden.authenticated(MANAGER, credentials) {
-        for (i in boughtComponentRepo.get(orderId, clientId))
+        for (i in boughtComponentRepo.get(orderId))
             if (!boughtComponentRepo.delete(i)) throw IllegalStateException()
         if (orderRepo.delete(orderId, clientId)) responseOk else throw IllegalStateException()
     }
@@ -353,6 +353,6 @@ class Controller(
     @GetMapping("/login", produces = ["text/html;charset=UTF-8"])
     fun loginPage() = "static/login.html".fileContent
 
-    @GetMapping("/login", produces = ["text/html;charset=UTF-8"])
+    @GetMapping("/register", produces = ["text/html;charset=UTF-8"])
     fun registerPage() = "static/register.html".fileContent
 }

@@ -6,10 +6,10 @@ window.checkCredentials = (credentials, callback) => fetch(
     {method: 'GET', headers: {'Auth-credentials': credentials}}
 ).then(response => response.text()).then(text => {
     if (text === 'null') alert('Wrong credentials')
-    else callback()
+    else callback(text)
 })
 
-window.credentials = () => {
+window.getCredentials = () => {
     const eqIndex = document.cookie.indexOf('=')
     if (eqIndex === -1) return null
     return document.cookie.substring(eqIndex + 1)

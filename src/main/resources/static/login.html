@@ -22,7 +22,7 @@
                     return
                 }
 
-                checkCredentials(credentials, () => {
+                checkCredentials(credentials, _ => {
                     document.cookie = 'credentials=' + credentials
                     redir('/')
                 })

@@ -4,16 +4,47 @@
         <meta charset="UTF-8">
         <title></title>
         <script src="helper.js"></script>
+        <style>
+            .list {
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                border: 1px solid black;
+            }
+            .item {
+                display: flex;
+                flex-direction: row;
+                margin: 5px;
+            }
+            .item:hover {
+                background-color: cyan;
+            }
+        </style>
     </head>
     <body>
-        <div style="
-            display: flex;
-            flex-direction: column;
-        "></div>
         <button>Go to orders page</button>
+        <h1>Components catalogue</h1>
+        <div class="list">
+            <div class="item" style="background-color: darkgray">
+                <span style="width: 50%">Name</span>
+                <span style="width: 20%">Type</span>
+                <span style="width: 20%">Cost</span>
+                <span style="width: 10%">Count</span>
+            </div>
+        </div>
         <script>
+            fetchUsername()
             fetchComponents()
-            checkCredentials()
+
+            function fetchUsername() {
+                const credentials = getCredentials()
+                if (credentials == null) return
+                checkCredentials(credentials, name => {
+                    const username = document.createElement('span')
+                    username.innerText = name
+                    document.querySelector('body').appendChild(username)
+                })
+            }
 
             function fetchComponents() {
                 fetch('/getAllComponents', {method: 'GET'})
@@ -21,9 +52,30 @@
                     .then(json => {
                         const list = document.querySelector('div')
                         for (const component of json) {
-                            const paragraph = document.createElement('p')
-                            paragraph.textContent = component.name + ' ' + parseType(component.type) + ' ' + component.cost + ' ' + component.count
-                            list.appendChild(paragraph)
+                            const item = document.createElement('div')
+                            item.className = 'item'
+
+                            const name = document.createElement('span')
+                            name.textContent = component.name
+                            name.style.width = '50%'
+                            item.appendChild(name)
+
+                            const type = document.createElement('span')
+                            type.textContent = parseType(component.type)
+                            type.style.width = '20%'
+                            item.appendChild(type)
+
+                            const cost = document.createElement('span')
+                            cost.textContent = component.cost
+                            cost.style.width = '20%'
+                            item.appendChild(cost)
+
+                            const count = document.createElement('span')
+                            count.textContent = component.count
+                            count.style.width = '10%'
+                            item.appendChild(count)
+
+                            list.appendChild(item)
                         }
                     })
             }
