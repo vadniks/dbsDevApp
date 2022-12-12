@@ -2,9 +2,33 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>Component</title>
+        <title>Component information</title>
+        <style>
+            span { display: block; }
+        </style>
+        <script src="helper.js"></script>
     </head>
     <body>
+        <button onclick="redir('/')">Home</button>
+        <h1></h1>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+        <script>
+            const query = window.location.search,
+                id = parseInt(query.substring(query.indexOf('=') + 1))
 
+            fetch('/getComponent?id=' + id, {method: 'GET'}).then(response => response.json()).then(component => {
+                document.querySelector('h1').textContent = component.name
+                const spans = document.querySelectorAll('span')
+                spans[0].textContent = 'Type:' + parseType(component.type)
+                spans[1].textContent = 'Description: ' + component.description
+                spans[2].textContent = 'Cost: ' + component.cost
+                spans[3].textContent = 'Count: ' + component.count
+                // spans[4].textContent = 'Image: ' + component.image
+            })
+        </script>
     </body>
 </html>

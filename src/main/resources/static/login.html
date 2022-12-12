@@ -25,7 +25,7 @@
                 checkCredentials(credentials, _ => {
                     document.cookie = 'credentials=' + credentials
                     redir('/')
-                })
+                }, () => alert('Wrong credentials'))
             }
         </script>
     </head>

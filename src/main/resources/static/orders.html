@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Orders</title>
+    </head>
+    <body>
+        <h1>Orders made by </h1>
+        <script>
+            checkCredentials(getCredentials(), username => {
+                const h1 = document.querySelector('h1')
+                h1.textContent = h1.textContent + username
+            })
+        </script>
+    </body>
+</html>

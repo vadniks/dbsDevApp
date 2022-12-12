@@ -355,4 +355,7 @@ class Controller(
 
     @GetMapping("/register", produces = ["text/html;charset=UTF-8"])
     fun registerPage() = "static/register.html".fileContent
+
+    @GetMapping("/component", produces = ["text/html;charset=UTF-8"])
+    fun componentPage() = "static/component.html".fileContent
 }
