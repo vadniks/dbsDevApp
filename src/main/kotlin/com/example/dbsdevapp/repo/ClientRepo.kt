@@ -23,10 +23,10 @@ class ClientRepo(
 
     fun get(): List<Client> = template.query("select * from $CLIENTS", clientMapper)
 
-    fun get(name: String, password: String) = null.tryCatch { template.queryForObject(
-        "select * from $CLIENTS where $NAME = ? and $PASSWORD = ?",
+    fun get(email: String, password: String) = null.tryCatch { template.queryForObject(
+        "select * from $CLIENTS where $EMAIL = ? and $PASSWORD = ?",
         clientMapper,
-        name, password
+        email, password
     ) }
 
     fun update(client: Client) = template.update(

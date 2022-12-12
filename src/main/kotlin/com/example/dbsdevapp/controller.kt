@@ -2,6 +2,7 @@ package com.example.dbsdevapp
 
 import com.example.dbsdevapp.entity.*
 import com.example.dbsdevapp.repo.*
+import org.springframework.core.io.ClassPathResource
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
@@ -226,6 +227,17 @@ class Controller(
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
     ) = null.authenticated(MANAGER, credentials) { employeeInfoRepo.get1(email) }
 
+    private inline fun <T> String.parseCredentials(crossinline action: (List<String>) -> T?)
+    = split(':').run { action(this) }
+
+    @ResponseBody
+    @GetMapping("/checkCredentials")
+    fun checkCredentials(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
+    = null.authenticated(CLIENT, credentials) { credentials.parseCredentials { clientRepo.get(it[0], it[1]) } }
+    ?: null.authenticated(MANAGER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER) } }
+    ?: null.authenticated(DELIVERY_WORKER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER) } }
+    ?: false
+
     // curl 'localhost:8080/countOrders' -H 'Auth-credentials: manager:pass'
     @GetMapping("/countOrders")
     fun countOrders(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
@@ -331,4 +343,16 @@ class Controller(
             if (!boughtComponentRepo.delete(i)) throw IllegalStateException()
         if (orderRepo.delete(orderId, clientId)) responseOk else throw IllegalStateException()
     }
+
+    private val String.fileContent get() = ClassPathResource(this)
+        .inputStream.readAllBytes().decodeToString()
+
+    @GetMapping("/", produces = ["text/html;charset=UTF-8"])
+    fun indexPage() = "static/components.html".fileContent
+
+    @GetMapping("/login", produces = ["text/html;charset=UTF-8"])
+    fun loginPage() = "static/login.html".fileContent
+
+    @GetMapping("/login", produces = ["text/html;charset=UTF-8"])
+    fun registerPage() = "static/register.html".fileContent
 }

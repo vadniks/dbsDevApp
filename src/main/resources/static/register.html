@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Register</title>
+        <script src="helper.js"></script>
+        <script>
+            function register() {
+                const inputs = document.querySelectorAll('input'),
+                    name = inputs[0].value,
+                    surname = inputs[1].value,
+                    _phone = inputs[2].value,
+                    address = inputs[3].value,
+                    email = inputs[4].value,
+                    password = inputs[5].value
+
+                let phone = -1;
+                try { phone = parseInt(_phone) }
+                catch (_) {
+                    alert('Wrong phone number')
+                    return
+                }
+
+                if (email.indexOf(':') !== -1 || password.indexOf(':') !== -1) {
+                    alert('Email and password cannot contain ":" symbol')
+                    return
+                }
+
+                if (email.indexOf('=') !== -1 || password.indexOf('=') !== -1) {
+                    alert('Email and password cannot contain "=" symbol')
+                    return
+                }
+
+                fetch(
+                    '/newClient',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            'id': null,
+                            'name': name,
+                            'surname': surname,
+                            'phone': phone,
+                            'address': address,
+                            'email': email,
+                            'password': password
+                        })
+                    }
+                ).then(response => {
+                    if (response.status === 200) redir('/')
+                    else alert('An error has occurred')
+                })
+            }
+        </script>
+    </head>
+    <body>
+        <input type="text" placeholder="Name">
+        <input type="text" placeholder="Surname">
+        <input type="number" placeholder="Phone">
+        <input type="text" placeholder="Address">
+        <input type="email" placeholder="email">
+        <input type="password" placeholder="password">
+        <button onclick="register()">Register</button>
+    </body>
+</html>

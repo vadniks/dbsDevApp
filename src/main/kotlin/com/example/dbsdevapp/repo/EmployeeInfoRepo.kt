@@ -31,10 +31,10 @@ class EmployeeInfoRepo(
         email
     ) }
 
-    fun get(name: String, password: String, jobType: JobType) = null.tryCatch { template.queryForObject(
-        "select * from $EMPLOYEE_INFO where $NAME = ? and $PASSWORD = ? and $JOB_TYPE = ?",
+    fun get(email: String, password: String, jobType: JobType) = null.tryCatch { template.queryForObject(
+        "select * from $EMPLOYEE_INFO where $EMAIL = ? and $PASSWORD = ? and $JOB_TYPE = ?",
         employeeInfoMapper,
-        name, password, jobType.type
+        email, password, jobType.type
     ) }
 
     fun get(): List<EmployeeInfo> = template.query("select * from $EMPLOYEE_INFO", employeeInfoMapper)

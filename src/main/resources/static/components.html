@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title></title>
+        <script src="helper.js"></script>
+    </head>
+    <body>
+        <div style="
+            display: flex;
+            flex-direction: column;
+        "></div>
+        <button>Go to orders page</button>
+        <script>
+            fetchComponents()
+            checkCredentials()
+
+            function fetchComponents() {
+                fetch('/getAllComponents', {method: 'GET'})
+                    .then(response => response.json())
+                    .then(json => {
+                        const list = document.querySelector('div')
+                        for (const component of json) {
+                            const paragraph = document.createElement('p')
+                            paragraph.textContent = component.name + ' ' + parseType(component.type) + ' ' + component.cost + ' ' + component.count
+                            list.appendChild(paragraph)
+                        }
+                    })
+            }
+
+            function parseType(which) { switch (which) {
+                case 0: return 'Processor'
+                case 1: return 'Motherboard'
+                case 2: return 'Graphics processor'
+                case 3: return 'Operating memory'
+                case 4: return 'Hard drive'
+                case 5: return 'Solid state drive'
+                case 6: return 'Power supply unit'
+                case 7: return 'Cooler'
+                case 8: return 'Case'
+            } }
+        </script>
+    </body>
+</html>
