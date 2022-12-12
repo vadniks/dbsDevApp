@@ -25,6 +25,10 @@
     <body>
         <h1 id="welcome" style="display: none"></h1><br>
         <button onclick="redir('/orders')">Go to orders page</button>
+        <button onclick="redir('/login')">Log in</button>
+        <button onclick="redir('/register')">Register</button>
+        <button onclick="setCookie('credentials', ''); redir('/')">Log out</button>
+        <button onclick="createOrder()">Create order</button>
         <h1>Components catalogue</h1>
         <div class="list">
             <div class="item" style="background-color: darkgray">
@@ -41,6 +45,7 @@
             function fetchUsername() {
                 const credentials = getCredentials()
                 if (credentials == null) return
+
                 checkCredentials(credentials, fullName => {
                     const user = document.createElement('span')
                     user.innerText = fullName
@@ -84,6 +89,29 @@
                             list.appendChild(item)
                         }
                     })
+            }
+
+            function createOrder() {
+                const cookie = getCookie('added')
+                if (cookie == null) {
+                    alert('No components added, you can add them on the each component details page, by clicking on one')
+                    return
+                }
+                const credentials = getCredentials()
+                if (credentials == null) {
+                    alert('Log in first')
+                    return
+                }
+
+                fetch('/getClient1', {method: 'GET', headers: {'Auth-credentials': credentials}})
+                    .then(response => response.json())
+                    .then(client => fetch(
+                            '/newOrder?clientId=' + client.id + '&componentIds=' + cookie.substring(1, cookie.length),
+                            {method: 'POST', headers: {'Auth-credentials': credentials}}
+                        ).then(response => {
+                            if (response.status === 200) redir('/orders')
+                            else alert('An error has occurred')
+                        }))
             }
         </script>
     </body>

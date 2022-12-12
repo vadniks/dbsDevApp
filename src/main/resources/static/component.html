@@ -10,6 +10,7 @@
     </head>
     <body>
         <button onclick="redir('/')">Home</button>
+        <button onclick="add()">Add to order</button>
         <h1></h1>
         <span></span>
         <span></span>
@@ -29,6 +30,23 @@
                 spans[3].textContent = 'Count: ' + component.count
                 // spans[4].textContent = 'Image: ' + component.image
             })
+
+            function add() {
+                if (getCredentials() == null) {
+                    alert('Not logged in')
+                    return
+                }
+
+                const previous = getCookie('added')
+                if (previous != null)
+                    for (const _id of previous.split(','))
+                        if (id.toString() === _id) {
+                            alert('Component already added')
+                            return
+                        }
+
+                setCookie('added', (previous == null ? '' : previous) + ',' + id)
+            }
         </script>
     </body>
 </html>

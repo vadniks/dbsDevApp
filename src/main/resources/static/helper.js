@@ -9,11 +9,7 @@ window.checkCredentials = (credentials, callback, onError) => fetch(
     else callback(fullName)
 })
 
-window.getCredentials = () => {
-    const eqIndex = document.cookie.indexOf('=')
-    if (eqIndex === -1) return null
-    return document.cookie.substring(eqIndex + 1)
-}
+window.getCredentials = () => getCookie('credentials')
 
 window.parseType = which => { switch (which) {
     case 0: return 'Processor'
@@ -26,3 +22,20 @@ window.parseType = which => { switch (which) {
     case 7: return 'Cooler'
     case 8: return 'Case'
 } }
+
+window.setCookie = (cname, cvalue) => document.cookie = `${cname}=${cvalue};`
+
+function getCookie(cname) {
+    const name = cname + "=";
+    const decodedCookie = decodeURIComponent(document.cookie);
+    const ca = decodedCookie.split(';');
+
+    for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) === ' ')
+            c = c.substring(1);
+        if (c.indexOf(name) === 0)
+            return c.substring(name.length, c.length);
+    }
+    return null;
+}
