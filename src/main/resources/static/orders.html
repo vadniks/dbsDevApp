@@ -20,6 +20,7 @@
                 cursor: pointer;
             }
         </style>
+        <script src="helper.js"></script>
     </head>
     <body>
         <h1>Orders made by </h1>
@@ -27,11 +28,11 @@
             <div class="item" style="background-color: darkgray">
                 <span style="width: 10%">Order identifier</span>
                 <span style="width: 15%">Manager full name</span>
-                <span style="width: 15%">Delivery worker full name</span>
+                <span style="width: 20%">Delivery worker full name</span>
                 <span style="width: 10%">Full cost</span>
                 <span style="width: 10%">Components count</span>
-                <span style="width: 20%">Created on </span>
-                <span style="width: 20%">Completed on </span>
+                <span style="width: 17.5%">Created on </span>
+                <span style="width: 17.5%">Completed on </span>
             </div>
         </div>
         <script>
@@ -41,17 +42,18 @@
                 exit(0)
             }
 
-            checkCredentials(credentials, username => {
+            checkCredentials(credentials, fullName => {
                 const h1 = document.querySelector('h1')
-                h1.textContent = h1.textContent + username
+                h1.textContent = h1.textContent + fullName
+                const config = {method: 'GET', headers: {'Auth-credentials': credentials}}
 
-                fetch('/getClient1', {method: 'GET', headers: {'Auth-credentials': credentials}})
+                fetch('/getClient1', config)
                     .then(response => response.json())
                     .then(client =>
-                        fetch('/getClientOrders?clientId=' + client.clientId)
+                        fetch('/getClientOrders?clientId=' + client.id, config)
                             .then(response => response.json())
                             .then(json => {
-                                const list = document.querySelector('.div')
+                                const list = document.querySelector('.list')
                                 for (const order of json) {
                                     const item = document.createElement('div')
                                     item.className = 'item'
@@ -71,7 +73,7 @@
                                     item.appendChild(manager)
 
                                     const delivery = document.createElement('span')
-                                    delivery.style.width = '15%'
+                                    delivery.style.width = '20%'
                                     fetch(
                                         '/getEmployeeFullName?id=' + order.deliveryWorkerId,
                                         {method: 'GET'}
@@ -90,13 +92,13 @@
                                     item.appendChild(count)
 
                                     const created = document.createElement('span')
-                                    created.style.width = '10%'
-                                    created.textContent = order.created
+                                    created.style.width = '17.5%'
+                                    created.textContent = order.creationDatetime
                                     item.appendChild(created)
 
                                     const completed = document.createElement('span')
-                                    completed.style.width = '10%'
-                                    completed.textContent = order.completed
+                                    completed.style.width = '17.5%'
+                                    completed.textContent = order.completionDatetime
                                     item.appendChild(completed)
 
                                     list.appendChild(item)

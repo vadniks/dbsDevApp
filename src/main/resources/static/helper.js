@@ -4,9 +4,9 @@ window.redir = where => window.location.replace(where)
 window.checkCredentials = (credentials, callback, onError) => fetch(
     '/checkCredentials',
     {method: 'GET', headers: {'Auth-credentials': credentials}}
-).then(response => response.text()).then(text => {
-    if (text === 'null') if (onError != null) onError()
-    else callback(text)
+).then(response => response.text()).then(fullName => {
+    if (fullName === 'false') { if (onError != null) onError() }
+    else callback(fullName)
 })
 
 window.getCredentials = () => {

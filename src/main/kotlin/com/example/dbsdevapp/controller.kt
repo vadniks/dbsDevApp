@@ -201,7 +201,7 @@ class Controller(
     // curl 'localhost:8080/getClientOrders?clientId=1' -H 'Auth-credentials: client1:pass'
     @ResponseBody
     @GetMapping("/getClientOrders")
-    fun getUserOrders(
+    fun getClientOrders(
         @RequestParam clientId: Int,
         @RequestHeader(AUTH_CREDENTIALS) credentials: String
     ) = { orderRepo.get(clientId).json }.run {
@@ -242,9 +242,9 @@ class Controller(
     @ResponseBody
     @GetMapping("/checkCredentials")
     fun checkCredentials(@RequestHeader(AUTH_CREDENTIALS) credentials: String)
-    = null.authenticated(CLIENT, credentials) { credentials.parseCredentials { clientRepo.get(it[0], it[1])?.name } }
-    ?: null.authenticated(MANAGER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER)?.name } }
-    ?: null.authenticated(DELIVERY_WORKER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER)?.name } }
+    = null.authenticated(CLIENT, credentials) { credentials.parseCredentials { clientRepo.get(it[0], it[1])?.run { name + ' ' + surname } } }
+    ?: null.authenticated(MANAGER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER)?.run { name + ' ' + surname } } }
+    ?: null.authenticated(DELIVERY_WORKER, credentials) { credentials.parseCredentials { employeeInfoRepo.get(it[0], it[1], JobType.MANAGER)?.run { name + ' ' + surname } } }
     ?: false
 
     // curl 'localhost:8080/countOrders' -H 'Auth-credentials: manager:pass'
@@ -367,4 +367,7 @@ class Controller(
 
     @GetMapping("/component", produces = ["text/html;charset=UTF-8"])
     fun componentPage() = "static/component.html".fileContent
+
+    @GetMapping("/orders", produces = ["text/html;charset=UTF-8"])
+    fun ordersPage() = "static/orders.html".fileContent
 }

@@ -12,7 +12,7 @@
                     password = inputs[1].value,
                     credentials = email + ':' + password
 
-                if (email.indexOf(':') !== -1 || password.indexOf(':') !== -1) {
+                if (email.indexOf(':') !== -1 || password.indexOf('=') !== -1) {
                     alert('Email and password cannot contain ":" symbol')
                     return
                 }

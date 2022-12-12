@@ -23,7 +23,7 @@
         </style>
     </head>
     <body>
-        <button>Go to orders page</button>
+        <button onclick="redir('/orders')">Go to orders page</button>
         <h1>Components catalogue</h1>
         <div class="list">
             <div class="item" style="background-color: darkgray">
@@ -40,9 +40,9 @@
             function fetchUsername() {
                 const credentials = getCredentials()
                 if (credentials == null) return
-                checkCredentials(credentials, name => {
+                checkCredentials(credentials, fullName => {
                     const username = document.createElement('span')
-                    username.innerText = name
+                    username.innerText = fullName
                     document.querySelector('body').appendChild(username)
                 }, null)
             }
